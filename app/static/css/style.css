@@ -1,0 +1,156 @@
+/* Font imports*/
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap');
+
+/* Variable declarations. */
+:root {
+    --background-color: rgb(238, 240, 242);
+    --header-color: rgb(2, 96, 76);
+    --blue-color: rgb(23, 50, 72);
+    --light-blue: rgb(34, 75, 109);
+    --grey-white: rgb(218, 221, 216);
+}
+
+/* Body styling */
+body {
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Nunito Sans', sans-serif;
+    background-color: var(--background-color);
+    min-height: 100vh;
+    display:flex;
+    flex-direction: column;
+}
+
+
+/* Header section */
+
+header {
+    background-color: var(--header-color);
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+/* ul*/
+.navlist {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* li */
+.navitem {
+    display: inline;
+}
+
+/* a */
+.navbutton {
+    color: rgb(238, 240, 242);
+    text-align: center;
+    text-decoration: none;
+    padding: 0px max(10px, 2vw);
+    font-size: min(5vw, 2rem);
+}
+
+.navbutton:hover {
+    background-color: rgb(48, 115, 81);
+}
+
+
+/* Home Page */
+
+h1 {
+    text-align: center;
+}
+
+.box-flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 20px;
+}
+
+.section-box {
+    border: 3px solid black;
+    border-radius: 10px;
+    width: min(400px, 90vw);
+    height: 400px;
+    text-align: center;
+    background-color: white;
+
+    display:flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+
+.section-image {
+    width: min(300px, 80vw)
+}
+
+
+.blue-button {
+    border: 2px solid var(--blue-color);
+    border-radius: 10px;
+    font-size: 2rem;
+    padding: 10px;
+    text-decoration: none;
+    background-color: var(--blue-color);
+    color: white;
+    max-width: fit-content;
+}
+
+.blue-button:hover {
+    background-color: var(--light-blue);
+    cursor: pointer;
+}
+
+
+/* Upload Data page. */
+.info-box {
+    text-align: left;
+    display:flex;
+    flex-direction: column;
+    width: min(400px, 90vw);
+    align-self: center;
+}
+
+.info-text {
+    margin-block: 0.5em;
+}
+
+.list-header {
+    margin-bottom: 0px;
+}
+
+.info-list {
+    /* No top margin to decrease distance from heading. */
+    margin-top: 0px;
+    margin-bottom: 0.5em;
+}
+
+.centre-form {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.form-button {
+    font-size: 1rem;
+    padding:5px;
+    text-decoration: none;
+    background-color: var(--grey-white);
+    border: none;
+}
+
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
