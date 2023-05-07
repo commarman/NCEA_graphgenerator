@@ -9,12 +9,13 @@
             <li>Contain NCEA data</li>
         </ul>
     <div class="centre-form">
-        <form method="post" enctype="multipart/form-data">
+        <form action="/submit-nzqa" method="post" enctype="multipart/form-data">
             <label for="csvfile" class="form-button">Select CSV file</label>
-            <input type="file" name="csvfile" id="csvfile" accept=".csv" class="hidden" onchange="displayFilename(this)">
+            <input type="file" name="nzqa" id="csvfile" accept=".csv" class="hidden" onchange="displayFilename(this)">
             <p id="filename-display"></p>
             <label for="submit-button" class="form-button" id="submit-label" style="visibility:hidden;">Upload</label>
             <input type="submit" class="hidden" id="submit-button">
+            {{form.csrf_token}}
         </form>
     </div>
     </div>

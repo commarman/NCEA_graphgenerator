@@ -1,5 +1,7 @@
 from app import app
 from flask import render_template, g, request, redirect, url_for, session, json, flash
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from flask_sqlalchemy import SQLAlchemy
 import os
 import app.data_uploader as upload
@@ -10,6 +12,9 @@ app.config ['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(basedir, "r
 db.init_app(app)
 import app.models as models
 app.config.from_pyfile('config.py')
+
+class UploadForm(FlaskForm):
+    nzqa = FileField(validators=[FileRequired(), FileAllowed(["csv"])])
 
 @app.route("/")
 def home():
@@ -23,22 +28,31 @@ def nzqa_data():
         return redirect("/")
     return render_template("compare.html")
 
+
 @app.route("/submit-nzqa", methods=["GET","POST"])
 def submit_data():
     """Submit NCEA data for upload."""
-    if request.method == "POST":
-        csv_file = request.files["csvfile"]
 
-        if csv_file.filename == "":
-            # Empy file
-            return render_template("upload.html")
+    form = UploadForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        file = form.nzqa.data
+        lines = upload.read_csv(file)
+        print(lines)
 
-        else:
-            lines = upload.read_csv(csv_file)
-            #upload.add_categories(lines, db, models)
-            #upload.add_results(lines, db, models)
+    # if request.method == "POST":
+    #     csv_file = request.files["csvfile"]
 
-    return render_template("upload.html")
+    #     if csv_file.filename == "":
+    #         # Empty file
+    #         return render_template("upload.html")
+
+    #     else:
+    #         lines = upload.read_csv(csv_file)
+    #         upload.add_categories(lines, db, models)
+    #         upload.add_results(lines, db, models)
+
+    return render_template("upload.html", form = form)
 
 @app.route("/result-test")
 def result_test():
