@@ -2,6 +2,8 @@ EXT_ASSESS = "Externally Assessed"
 BHS_NAME = "Burnside High School"
 NATIONAL_NAME = "National"
 
+import numpy as np
+
 def read_csv(csv_file):
     """Read the csv file."""
     lines = csv_file.readlines()
@@ -41,7 +43,10 @@ def add_results(csv_file, db, models):
     """Add results from a csv file.
        Assumes all subjects, ethnicities, and years already exist in the corresponding
        table."""
-    for line in csv_file:
+
+    csv_file = np.array(csv_file)
+    used_lines = csv_file[(csv_file[:,5] == '0')]
+    for line in used_lines:
         subject, level, ethnicity, assess_type, year = line[:5]
         bhs_results = line[5:18]
         compare_results = line[18:]
@@ -76,4 +81,3 @@ def add_results(csv_file, db, models):
         db.session.add(bhs_result)
         db.session.add(comp_result)
         db.session.commit()
-        i += 1

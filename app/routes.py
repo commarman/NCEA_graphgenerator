@@ -34,11 +34,10 @@ def submit_data():
     """Submit NCEA data for upload."""
 
     form = UploadForm()
-    print(form.validate_on_submit())
     if form.validate_on_submit():
         file = form.nzqa.data
         lines = upload.read_csv(file)
-        print(lines)
+        upload.add_results(lines, db, models)
 
     # if request.method == "POST":
     #     csv_file = request.files["csvfile"]
