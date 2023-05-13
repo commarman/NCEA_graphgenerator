@@ -143,12 +143,51 @@ h1 {
 
 .form-button {
     font-size: 1rem;
-    padding:5px;
+    padding:5px 10px;
     text-decoration: none;
     background-color: var(--grey-white);
     border: none;
+    color: black;
+    width: fit-content;
 }
 
+
+/* Graph Generation Page. */
+.centred-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    text-align: center;
+}
+
+.filter-form {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin-top: 10px;
+    border: 1px solid black;
+    border-radius: 5px;
+    width: min(400px, 90vw);
+    height: 400px;
+    text-align: center;
+    background-color: white;
+}
+
+
+/* Dialog Boxes*/
+
+.flash-dialog {
+    margin-top: max(20vh, 150px);
+    animation-name: from-top;
+    animation-duration: 0.5s;
+}
+
+/* Animations */ 
+@keyframes from-top {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+  }
+  
 
 /* Footer */
 footer {

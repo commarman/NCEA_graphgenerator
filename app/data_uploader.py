@@ -80,4 +80,4 @@ def add_results(csv_file, db, models):
         comp_entries, comp_assessed, comp_na, comp_a, comp_m, comp_e)
         db.session.add(bhs_result)
         db.session.add(comp_result)
-        db.session.commit()
+    db.session.commit()

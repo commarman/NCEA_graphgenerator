@@ -1,8 +1,7 @@
 from app import app
 from flask import render_template, g, request, redirect, url_for, session, json, flash
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired, FileAllowed
 from flask_sqlalchemy import SQLAlchemy
+from app.forms import UploadForm, FilterForm
 import os
 import app.data_uploader as upload
 
@@ -13,8 +12,6 @@ db.init_app(app)
 import app.models as models
 app.config.from_pyfile('config.py')
 
-class UploadForm(FlaskForm):
-    nzqa = FileField(validators=[FileRequired(), FileAllowed(["csv"])])
 
 @app.route("/")
 def home():
@@ -25,7 +22,8 @@ def home():
 def nzqa_data():
     """Render the comparison graph generator page."""
     if len(models.Result.query.all()) == 0:
-        return redirect("/")
+        flash("There is currently no data. Upload data first.")
+        return redirect("/submit-nzqa")
     return render_template("compare.html")
 
 
