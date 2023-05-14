@@ -24,7 +24,10 @@ def nzqa_data():
     if len(models.Result.query.all()) == 0:
         flash("There is currently no data. Upload data first.")
         return redirect("/submit-nzqa")
-    return render_template("compare.html")
+    subjects = models.Subject.query.all()
+    subject_names = [subject.name for subject in subjects]
+    form = FilterForm(subject_names)
+    return render_template("compare.html", form = form)
 
 
 @app.route("/submit-nzqa", methods=["GET","POST"])
@@ -32,24 +35,22 @@ def submit_data():
     """Submit NCEA data for upload."""
 
     form = UploadForm()
+
+    return render_template("upload.html", form = form)
+
+@app.route("/read-data", methods=["POST"])
+def read_data():
+    """Read form data."""
+    form = UploadForm()
     if form.validate_on_submit():
         file = form.nzqa.data
         lines = upload.read_csv(file)
         upload.add_results(lines, db, models)
-
-    # if request.method == "POST":
-    #     csv_file = request.files["csvfile"]
-
-    #     if csv_file.filename == "":
-    #         # Empty file
-    #         return render_template("upload.html")
-
-    #     else:
-    #         lines = upload.read_csv(csv_file)
-    #         upload.add_categories(lines, db, models)
-    #         upload.add_results(lines, db, models)
-
-    return render_template("upload.html", form = form)
+        flash("Data succesfully Uploaded!")
+        return redirect("/nzqa-data")
+    else:
+        flash("Error: File didn't validate.")
+        return redirect("/submit-nzqa")
 
 @app.route("/result-test")
 def result_test():

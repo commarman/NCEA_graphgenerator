@@ -8,10 +8,20 @@
         </div>
         <p class="info-text">Select filters:</p>
         <div class="filter-form">
-
+            {{form.subject()}}
         </div>
     </div>
     </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages|length > 0 %}
+            <dialog open class="flash-dialog">
+                {% for message in messages %}
+                    <p>{{message}}</p>
+                {% endfor %}
+                <button onclick="this.parentElement.close()">Close</button>
+            </dialog>
+        {% endif %}
+    {% endwith %}
 
     {% block javascript %}
         <script>

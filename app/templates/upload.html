@@ -9,7 +9,7 @@
             <li>Contain NCEA data</li>
         </ul>
     <div class="centre-form">
-        <form action="/submit-nzqa" method="post" enctype="multipart/form-data">
+        <form action="/read-data" method="post" enctype="multipart/form-data">
             <label for="csvfile" class="form-button">Select CSV file</label>
             {{form.nzqa(id="csvfile", class="hidden", accept=".csv", onchange="displayFilename(this)")}}
             <p id="filename-display"></p>
