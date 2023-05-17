@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, g, request, redirect, url_for, session, json, flash
 from flask_sqlalchemy import SQLAlchemy
-from app.forms import UploadForm, FilterForm
+from app.forms import UploadForm, create_filter_form
 import os
 import app.data_uploader as upload
 
@@ -16,7 +16,7 @@ app.config.from_pyfile('config.py')
 @app.route("/")
 def home():
     """Render the home page."""
-    return render_template("home.html")
+    return render_template("home.html", page="home")
 
 @app.route("/nzqa-data")
 def nzqa_data():
@@ -26,8 +26,9 @@ def nzqa_data():
         return redirect("/submit-nzqa")
     subjects = models.Subject.query.all()
     subject_names = [subject.name for subject in subjects]
-    form = FilterForm(subject_names)
-    return render_template("compare.html", form = form)
+    subject_names.sort()
+    form = create_filter_form(subject_names)
+    return render_template("compare.html", form = form, page="graph")
 
 
 @app.route("/submit-nzqa", methods=["GET","POST"])
@@ -36,7 +37,7 @@ def submit_data():
 
     form = UploadForm()
 
-    return render_template("upload.html", form = form)
+    return render_template("upload.html", form = form, page="upload")
 
 @app.route("/read-data", methods=["POST"])
 def read_data():
@@ -45,12 +46,29 @@ def read_data():
     if form.validate_on_submit():
         file = form.nzqa.data
         lines = upload.read_csv(file)
+        upload.add_categories(lines, db, models)
         upload.add_results(lines, db, models)
         flash("Data succesfully Uploaded!")
         return redirect("/nzqa-data")
     else:
         flash("Error: File didn't validate.")
         return redirect("/submit-nzqa")
+
+
+@app.route("/retrieve-graph-data", methods=["POST"])
+def retrieve_graph_data():
+    """Retrieve data by filters for graphing."""
+
+    subjects = models.Subject.query.all()
+    subject_names = [subject.name for subject in subjects]
+    subject_names.sort()
+    form = create_filter_form(subject_names)
+    if form.validate_on_submit():
+        subject = form.subject.data
+        subject_id = models.Subject.query.first_or_404().id
+        results = models.Result.query.filter_by(subject_id = subject_id).group_by(models.Result.year_id)
+    flash("It didn't work as expected/")
+    return redirect("/nzqa-data")
 
 @app.route("/result-test")
 def result_test():

@@ -17,12 +17,13 @@ def add_categories(csv_file, db, models):
     ethnicities = set()
     years = set()
     for line in csv_file:
-        subjects.add(line[0].capitalize())
-        ethnicities.add(line[2])
-        try:
-            years.add(line[4])
-        except:
-            print(line)
+        if line[5] != '0':  # Column 5 is the number of BHS entries.
+            subjects.add(line[0].capitalize())
+            ethnicities.add(line[2])
+            try:
+                years.add(line[4])
+            except:
+                print(line)
 
     # Add new categories if they don't already exist.
     for subject in subjects:
@@ -45,7 +46,7 @@ def add_results(csv_file, db, models):
        table."""
 
     csv_file = np.array(csv_file)
-    used_lines = csv_file[(csv_file[:,5] == '0')]
+    used_lines = csv_file[(csv_file[:,5] != '0')]
     for line in used_lines:
         subject, level, ethnicity, assess_type, year = line[:5]
         bhs_results = line[5:18]

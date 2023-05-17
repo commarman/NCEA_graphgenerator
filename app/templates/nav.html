@@ -1,5 +1,15 @@
 <ul class="navlist">
-    <li class="navitem"><a class="navbutton" href="/">Home</a></li>
-    <li class="navitem"><a class="navbutton" href="/submit-nzqa">Submit Data</a></li>
-    <li class="navitem"><a class="navbutton" href="/nzqa-data">Graph Data</a></li>
+    <li class="navitem">
+        <a class="navbutton" href="/" id="home">Home</a>
+    </li>
+    <li class="navitem">
+        <a class="navbutton" href="/submit-nzqa" id="submit">Submit Data</a>
+    </li>
+    <li class="navitem"><a class="navbutton" href="/nzqa-data" id="graph">Graph Data</a></li>
+
+    {% block javascript %}
+        <script>
+            document.getElementById(JSON.parse({{page | tojson}})).style.background-color = "red";
+        </script>
+    {% endblock %}
 </ul>

@@ -8,7 +8,11 @@
         </div>
         <p class="info-text">Select filters:</p>
         <div class="filter-form">
-            {{form.subject()}}
+            <form action="/retrieve-graph-data" method="post">
+                {{form.subject()}}
+                {{form.submit()}}
+                {{form.csrf_token}}
+            </form>
         </div>
     </div>
     </div>
