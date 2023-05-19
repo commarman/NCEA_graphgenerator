@@ -15,7 +15,7 @@
             </form>
         </div>
     </div>
-    </div>
+    <canvas id="NCEAgraph" width="300px" height="100px"></canvas>
     {% with messages = get_flashed_messages() %}
         {% if messages|length > 0 %}
             <dialog open class="flash-dialog">
@@ -26,10 +26,21 @@
             </dialog>
         {% endif %}
     {% endwith %}
-
+    {% if graph %}
     {% block javascript %}
         <script>
-            
+            labels = JSON.parse({{labels | tojson}});
+            data = JSON.parse({{data | tojson}});
+            new Chart("NCEAgraph", {
+                type="bar",
+                data : {
+                    labels: labels,
+                    datasets = [{
+                        data: data
+                    }]
+                }
+            })
         </script>
     {% endblock %}
+    {% endif %}
 {% endblock %}

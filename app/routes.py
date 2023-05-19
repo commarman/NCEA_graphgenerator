@@ -28,7 +28,7 @@ def nzqa_data():
     subject_names = [subject.name for subject in subjects]
     subject_names.sort()
     form = create_filter_form(subject_names)
-    return render_template("compare.html", form = form, page="graph")
+    return render_template("compare.html", form = form, page="graph", graph=False)
 
 
 @app.route("/submit-nzqa", methods=["GET","POST"])
@@ -55,6 +55,17 @@ def read_data():
         return redirect("/submit-nzqa")
 
 
+def render_graph(result_years):
+    """Render the html page with a graph."""
+    subjects = models.Subject.query.all()
+    subject_names = [subject.name for subject in subjects]
+    subject_names.sort()
+    form = create_filter_form(subject_names)
+    labels = json.dumps(list(result_years.keys()))
+    data = json.dumps(list(result_years.values()))
+    return render_template("compare.html", form = form, page="graph", labels = labels, data = data, graph = True)
+
+
 @app.route("/retrieve-graph-data", methods=["POST"])
 def retrieve_graph_data():
     """Retrieve data by filters for graphing."""
@@ -65,8 +76,13 @@ def retrieve_graph_data():
     form = create_filter_form(subject_names)
     if form.validate_on_submit():
         subject = form.subject.data
-        subject_id = models.Subject.query.first_or_404().id
-        results = models.Result.query.filter_by(subject_id = subject_id).group_by(models.Result.year_id)
+        subject_id = models.Subject.query.filter_by(name = subject).first_or_404().id
+        results = models.Result.query.filter_by(subject_id = subject_id)
+        result_years = {}
+        for result in results:
+            year = result.year.year
+            result_years[year] = result_years.get(year, 0) + result.achieved
+        return render_graph(result_years)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")
 
