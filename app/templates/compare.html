@@ -6,16 +6,25 @@
         <div class="centred-content">
             <a class="form-button" href="/submit-nzqa">Import</a>
         </div>
+        {% if graph %}
+        <div class="centred-content">
+            <div class="chart-container">
+                <canvas id="NCEAgraph"></canvas>
+            </div>
+        </div>
+        {% endif %}
         <p class="info-text">Select filters:</p>
         <div class="filter-form">
             <form action="/retrieve-graph-data" method="post">
                 {{form.subject()}}
+                {{form.level()}}
+                {{form.assess_type()}}
+                {{form.ethnicity()}}
                 {{form.submit()}}
                 {{form.csrf_token}}
             </form>
         </div>
     </div>
-    <canvas id="NCEAgraph" width="300px" height="100px"></canvas>
     {% with messages = get_flashed_messages() %}
         {% if messages|length > 0 %}
             <dialog open class="flash-dialog">
@@ -29,17 +38,49 @@
     {% if graph %}
     {% block javascript %}
         <script>
-            labels = JSON.parse({{labels | tojson}});
-            data = JSON.parse({{data | tojson}});
+            graph = JSON.parse({{info | tojson}});
             new Chart("NCEAgraph", {
-                type="bar",
+                type: "bar",
                 data : {
-                    labels: labels,
-                    datasets = [{
-                        data: data
-                    }]
+                    labels: graph["labels"],
+                    datasets : [
+                    {
+                        label: "Excellence",
+                        data: graph["excellence"],
+                        backgroundColor: 'rgb(245, 197, 66)',
+                    },
+                    {
+                        label: "Merit",
+                        data: graph["merit"],
+                        backgroundColor: 'rgb(66, 123, 245)',
+                    },{
+                        label: "Achieved",
+                        data: graph["achieved"],
+                        backgroundColor: 'rgb(245, 72, 66)',
+                    },],
+                },
+            options : {
+                scales: {
+                    yAxes : [{
+                        ticks : {
+                            beginAtZero : true
+                        }
+                    }],
+                    x : {
+                        stacked: true
+                    }
+                },
+                plugins: {
+                    title : {
+                        display: true,
+                        text: graph["title"]
+                    },
+                },
+                legend : {
+                    display: true
                 }
-            })
+            }
+            });
         </script>
     {% endblock %}
     {% endif %}

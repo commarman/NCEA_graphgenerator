@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from app.forms import UploadForm, create_filter_form
 import os
 import app.data_uploader as upload
+import numpy as np
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy()
@@ -18,16 +19,25 @@ def home():
     """Render the home page."""
     return render_template("home.html", page="home")
 
+def construct_filter_form():
+    """Construct a filter form."""
+    # Subjects.
+    subjects = models.Subject.query.all()
+    subject_names = [subject.name for subject in subjects]
+    subject_names.sort()
+    # Ethnicities.
+    ethnicities = models.Ethnicity.query.all()
+    ethnicity_list = [ethnicity.name for ethnicity in ethnicities]
+    ethnicity_list.sort()
+    return create_filter_form(subject_names, ethnicity_list)
+
 @app.route("/nzqa-data")
 def nzqa_data():
     """Render the comparison graph generator page."""
     if len(models.Result.query.all()) == 0:
         flash("There is currently no data. Upload data first.")
         return redirect("/submit-nzqa")
-    subjects = models.Subject.query.all()
-    subject_names = [subject.name for subject in subjects]
-    subject_names.sort()
-    form = create_filter_form(subject_names)
+    form = construct_filter_form()
     return render_template("compare.html", form = form, page="graph", graph=False)
 
 
@@ -55,89 +65,62 @@ def read_data():
         return redirect("/submit-nzqa")
 
 
-def render_graph(result_years):
+def render_graph(result_years, subject, title):
     """Render the html page with a graph."""
-    subjects = models.Subject.query.all()
-    subject_names = [subject.name for subject in subjects]
-    subject_names.sort()
-    form = create_filter_form(subject_names)
-    labels = json.dumps(list(result_years.keys()))
-    data = json.dumps(list(result_years.values()))
-    return render_template("compare.html", form = form, page="graph", labels = labels, data = data, graph = True)
+    form = construct_filter_form()
+    years = [result[0] for result in result_years]
+    values = [result[1] for result in result_years]
+    achieved = [value[0] for value in values]
+    merit = [value[1] for value in values]
+    excellence = [value[2] for value in values]
+    graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title}
+    graph_data = json.dumps(graph_dict)
+    return render_template("compare.html", form = form, page="graph", info = graph_data, graph = True)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])
 def retrieve_graph_data():
     """Retrieve data by filters for graphing."""
 
-    subjects = models.Subject.query.all()
-    subject_names = [subject.name for subject in subjects]
-    subject_names.sort()
-    form = create_filter_form(subject_names)
+    form = construct_filter_form()
     if form.validate_on_submit():
         subject = form.subject.data
         subject_id = models.Subject.query.filter_by(name = subject).first_or_404().id
-        results = models.Result.query.filter_by(subject_id = subject_id)
+        assess_type = "" if form.assess_type.data == "Both" else form.assess_type.data
+        level = "" if form.level.data == "No filter" else form.level.data + " "
+        if assess_type == "Internal":
+            results = models.Result.query.filter_by(subject_id = subject_id, grouping_id=1, external = 0)
+        elif assess_type == "External":
+            results = models.Result.query.filter_by(subject_id = subject_id, grouping_id=1, external = 1)
+        else:
+            results = models.Result.query.filter_by(subject_id = subject_id, grouping_id=1)
+        if level != "":
+            results = results.filter_by(level = int(level.split(" ")[1]))
+
+        if form.ethnicity.data != "No filter":
+            ethnicity = form.ethnicity.data
+            ethnicity_id = models.Ethnicity.query.filter_by(name = ethnicity).first_or_404().id
+            results = results.filter_by(ethnicity_id = ethnicity_id)
+            title = f"Burnside {level}{subject} {assess_type} results for {ethnicity} students"
+        else:
+            title = f"Burnside {level}{subject} {assess_type} results"
         result_years = {}
         for result in results:
             year = result.year.year
-            result_years[year] = result_years.get(year, 0) + result.achieved
-        return render_graph(result_years)
+            result_years[year] = result_years.get(year, np.zeros(3)) + np.array([result.achieved + result.merit + result.excellence, result.merit + result.excellence, result.excellence])
+        total_years = {}
+        for result in results:
+            year = result.year.year
+            total_years[year] = total_years.get(year, 0) + result.total_entries
+        percent_tuples = []
+        for year in total_years.keys():
+            computed_values = np.round(result_years[year] / total_years[year] * 100)
+            percent_tuples.append((year, (list(computed_values))))
+        percent_tuples.sort()
+        print(percent_tuples)
+        return render_graph(percent_tuples, subject, title)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")
-
-@app.route("/result-test")
-def result_test():
-    results = (
-        models.Result.query
-        .filter_by(subject_id = 1, external = True)
-        .group_by(models.Result.grouping_id, models.Result.year_id)
-        .with_entities( 
-            models.Result,
-            func.sum(models.Result.not_achieved),
-            func.sum(models.Result.achieved)))
-    for result in results:
-        print(result)
-        # print(result.id)
-        # print(result.ethnicity)
-        # print(result.year)
-        # print(result.subject)
-        # print((result.merit / result.total_entries))
-
-    labels = json.dumps([f"{result[0].year.year} {result[0].group.name}" for result in results])
-    data = json.dumps([result[2] for result in results])
-    return render_template("chart-test.html", data = data, labels = labels)
-
-@app.route("/ins")
-def insert_test():
-    insertion_dict = {
-        "subject_id" :2,
-        "ethnicity_id" : 3,
-        "grouping_id" : 1,
-        "year_id" : 2,
-        "external" : True,
-        "level" : 2,
-        "total_entries" : 100,
-        "assessed" : 89,
-        "not_achieved" : 16,
-        "achieved" : 21,
-        "merit" : 32,
-        "excellence" : 20
-    }
-
-    new_result = models.Result(insertion_dict)
-    db.session.add(new_result)
-    db.session.commit()
-    return "hi"
-
-@app.route("/del")
-def delete_test():
-    results = models.Result.query.delete()
-    db.session.commit()
-    return "wow"
-
-def APP():
-    return app
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -173,6 +173,10 @@ h1 {
     background-color: white;
 }
 
+.chart-container {
+    width: 1000px;
+}
+
 
 /* Dialog Boxes*/
 
