@@ -17,9 +17,13 @@
         <div class="filter-form">
             <form action="/retrieve-graph-data" method="post">
                 <div class="form-content">
+                    <label for="Subject" class="filter-label">Subject</label>
                     {{form.subject(class="filter-field")}}
+                    <label for="NCEA Level" class="filter-label">Level</label>
                     {{form.level(class="filter-field")}}
+                    <label for="Assessment Type" class="filter-label">Assessment Type</label>
                     {{form.assess_type(class="filter-field")}}
+                    <label for="Ethnicity" class="filter-label">Ethnicity</label>
                     {{form.ethnicity(class="filter-field")}}
                     {{form.submit()}}
                     {{form.csrf_token}}

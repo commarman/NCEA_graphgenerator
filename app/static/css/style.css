@@ -6,6 +6,7 @@
 :root {
     --background-color: rgb(238, 240, 242);
     --header-color: rgb(2, 96, 76);
+    --lighter-green: rgb(33, 109, 79);
     --blue-color: rgb(23, 50, 72);
     --light-blue: rgb(34, 75, 109);
     --grey-white: rgb(218, 221, 216);
@@ -151,6 +152,10 @@ h1 {
     width: fit-content;
 }
 
+.form-button:hover {
+    cursor: pointer;
+}
+
 
 /* Graph Generation Page. */
 .centred-content {
@@ -176,11 +181,27 @@ h1 {
 .form-content {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
 }
 
 .filter-field {
     margin-inline: 5px;
     margin: 5px;
+    background-color: var(--lighter-green);
+    font-family:'Nunito Sans', sans-serif;
+    font-size: min(3vw, 0.9rem);
+    color: white;
+    border: 2px solid var(--header-color);
+    border-radius: 2px;
+}
+
+.filter-field option {
+    font-size: min(3vw, 0.9rem);
+}
+
+.filter-label {
+    align-self: flex-start;
+    margin-inline: 5px;
 }
 
 .chart-container {
