@@ -173,6 +173,16 @@ h1 {
     background-color: white;
 }
 
+.form-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-field {
+    margin-inline: 5px;
+    margin: 5px;
+}
+
 .chart-container {
     width: 1000px;
 }

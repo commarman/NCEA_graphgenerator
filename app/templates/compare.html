@@ -16,12 +16,14 @@
         <p class="info-text">Select filters:</p>
         <div class="filter-form">
             <form action="/retrieve-graph-data" method="post">
-                {{form.subject()}}
-                {{form.level()}}
-                {{form.assess_type()}}
-                {{form.ethnicity()}}
-                {{form.submit()}}
-                {{form.csrf_token}}
+                <div class="form-content">
+                    {{form.subject(class="filter-field")}}
+                    {{form.level(class="filter-field")}}
+                    {{form.assess_type(class="filter-field")}}
+                    {{form.ethnicity(class="filter-field")}}
+                    {{form.submit()}}
+                    {{form.csrf_token}}
+                </div>
             </form>
         </div>
     </div>
@@ -61,11 +63,10 @@
                 },
             options : {
                 scales: {
-                    yAxes : [{
-                        ticks : {
-                            beginAtZero : true
-                        }
-                    }],
+                    y: {
+                        min: 0,
+                        max: 100
+                    },
                     x : {
                         stacked: true
                     }
