@@ -5,6 +5,7 @@ from app.forms import UploadForm, create_filter_form
 import os
 import app.data_uploader as upload
 import numpy as np
+import re
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy()
@@ -84,32 +85,35 @@ def retrieve_graph_data():
 
     form = construct_filter_form()
     if form.validate_on_submit():
+        # Get values from form.
         subject = form.subject.data
-        subject_id = models.Subject.query.filter_by(name = subject).first_or_404().id
-        assess_type = "" if form.assess_type.data == "Both" else form.assess_type.data
-        level = "" if form.level.data == "No filter" else form.level.data + " "
-        if assess_type == "Internal":
-            results = models.Result.query.filter_by(subject_id = subject_id, grouping_id=1, external = 0)
-        elif assess_type == "External":
-            results = models.Result.query.filter_by(subject_id = subject_id, grouping_id=1, external = 1)
-        else:
-            results = models.Result.query.filter_by(subject_id = subject_id, grouping_id=1)
-        if level != "":
-            results = results.filter_by(level = int(level.split(" ")[1]))
+        assess_type = form.assess_type.data
+        level = form.level.data
+        ethnicity = form.ethnicity.data
 
-        if form.ethnicity.data != "No filter":
-            ethnicity = form.ethnicity.data
+        base_results = models.Result.query
+        print(subject)
+        if subject != "No filter":
+            subject_id = models.Subject.query.filter_by(name = subject).first_or_404().id
+            base_results = base_results.filter_by(subject_id = subject_id)
+        if assess_type != "No filter":
+            assess_code = 1 if assess_type == "External" else 0
+            base_results = base_results.filter_by(external = assess_code)
+        if ethnicity != "No filter":
             ethnicity_id = models.Ethnicity.query.filter_by(name = ethnicity).first_or_404().id
-            results = results.filter_by(ethnicity_id = ethnicity_id)
-            title = f"Burnside {level}{subject} {assess_type} results for {ethnicity} students"
-        else:
-            title = f"Burnside {level}{subject} {assess_type} results"
+            base_results = base_results.filter_by(ethnicity_id = ethnicity_id)
+        if level != "No filter":
+            base_results.filter_by(level = int(level.split(" ")[1])) #  Level is received in format 'Level X'
+        
+        title = f"Burnside {level} {subject} {assess_type} results for {ethnicity} students"
+        title = re.sub("No filter ", "", title)  # Use regex to remove 'No filter' appearances.
+
         result_years = {}
-        for result in results:
+        for result in base_results:
             year = result.year.year
             result_years[year] = result_years.get(year, np.zeros(3)) + np.array([result.achieved + result.merit + result.excellence, result.merit + result.excellence, result.excellence])
         total_years = {}
-        for result in results:
+        for result in base_results:
             year = result.year.year
             total_years[year] = total_years.get(year, 0) + result.total_entries
         percent_tuples = []

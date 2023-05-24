@@ -7,11 +7,6 @@
             <a class="form-button" href="/submit-nzqa">Import</a>
         </div>
         {% if graph %}
-        <div class="centred-content">
-            <div class="chart-container">
-                <canvas id="NCEAgraph"></canvas>
-            </div>
-        </div>
         {% endif %}
         <p class="info-text">Select filters:</p>
         <div class="filter-form">
@@ -31,6 +26,11 @@
             </form>
         </div>
     </div>
+        <div class="centred-content">
+            <div class="chart-container">
+                <canvas id="NCEAgraph"></canvas>
+            </div>
+        </div>
     {% with messages = get_flashed_messages() %}
         {% if messages|length > 0 %}
             <dialog open class="flash-dialog">
@@ -69,10 +69,23 @@
                 scales: {
                     y: {
                         min: 0,
-                        max: 100
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + "%"
+                            }
+                        },
+                        title : {
+                            display: true,
+                            text: "Percentage"
+                        }
                     },
                     x : {
-                        stacked: true
+                        stacked: true,
+                        title : {
+                            display: true,
+                            text: "Year"
+                        }
                     }
                 },
                 plugins: {
