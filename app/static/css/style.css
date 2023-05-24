@@ -158,6 +158,15 @@ h1 {
 
 
 /* Graph Generation Page. */
+
+.page-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: max(2vw, 10px);
+    flex-flow: wrap;
+}
+
 .centred-content {
     display: flex;
     flex-direction: row;

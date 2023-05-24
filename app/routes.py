@@ -66,7 +66,7 @@ def read_data():
         return redirect("/submit-nzqa")
 
 
-def render_graph(result_years, subject, title):
+def render_graph(result_years, subject, title, entry_totals):
     """Render the html page with a graph."""
     form = construct_filter_form()
     years = [result[0] for result in result_years]
@@ -74,7 +74,8 @@ def render_graph(result_years, subject, title):
     achieved = [value[0] for value in values]
     merit = [value[1] for value in values]
     excellence = [value[2] for value in values]
-    graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title}
+    graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, 
+                  "entries": entry_totals, "title":title}
     graph_data = json.dumps(graph_dict)
     return render_template("compare.html", form = form, page="graph", info = graph_data, graph = True)
 
@@ -103,15 +104,17 @@ def retrieve_graph_data():
             ethnicity_id = models.Ethnicity.query.filter_by(name = ethnicity).first_or_404().id
             base_results = base_results.filter_by(ethnicity_id = ethnicity_id)
         if level != "No filter":
-            base_results.filter_by(level = int(level.split(" ")[1])) #  Level is received in format 'Level X'
+            base_results = base_results.filter_by(level = int(level.split(" ")[1])) #  Level is received in format 'Level X'
         
         title = f"Burnside {level} {subject} {assess_type} results for {ethnicity} students"
         title = re.sub("No filter ", "", title)  # Use regex to remove 'No filter' appearances.
 
+        total_entries = {}
         result_years = {}
         for result in base_results:
             year = result.year.year
             result_years[year] = result_years.get(year, np.zeros(3)) + np.array([result.achieved + result.merit + result.excellence, result.merit + result.excellence, result.excellence])
+            total_entries[year] = total_entries.get(year, 0) + result.total_entries
         total_years = {}
         for result in base_results:
             year = result.year.year
@@ -122,7 +125,7 @@ def retrieve_graph_data():
             percent_tuples.append((year, (list(computed_values))))
         percent_tuples.sort()
         print(percent_tuples)
-        return render_graph(percent_tuples, subject, title)
+        return render_graph(percent_tuples, subject, title, total_entries)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")
 

@@ -1,36 +1,46 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="info-box">
-        <h1>Graph Comparison</h1>
-        <p class="info-text">To compare data, first import data from NZQA</p>
-        <div class="centred-content">
-            <a class="form-button" href="/submit-nzqa">Import</a>
+    <div class="page-content">
+        <div class="info-box">
+            <h1>Graph Comparison</h1>
+            <p class="info-text">To compare data, first import data from NZQA</p>
+            <div class="centred-content">
+                <a class="form-button" href="/submit-nzqa">Import</a>
+            </div>
+            <p class="info-text">Select filters:</p>
+            <div class="filter-form">
+                <form action="/retrieve-graph-data" method="post">
+                    <div class="form-content">
+                        <label for="Subject" class="filter-label">Subject</label>
+                        {{form.subject(class="filter-field")}}
+                        <label for="NCEA Level" class="filter-label">Level</label>
+                        {{form.level(class="filter-field")}}
+                        <label for="Assessment Type" class="filter-label">Assessment Type</label>
+                        {{form.assess_type(class="filter-field")}}
+                        <label for="Ethnicity" class="filter-label">Ethnicity</label>
+                        {{form.ethnicity(class="filter-field")}}
+                        {{form.submit()}}
+                        {{form.csrf_token}}
+                    </div>
+                </form>
+            </div>
+            {% if graph %}
+                <button onclick="showInfo()" id="show-info-button">Show Additional Information</button>
+                <button onclick="hideInfo()" id="hide-info-button" style="display: none;">Hide Additional Information</button>
+            {% endif %}
         </div>
-        {% if graph %}
-        {% endif %}
-        <p class="info-text">Select filters:</p>
-        <div class="filter-form">
-            <form action="/retrieve-graph-data" method="post">
-                <div class="form-content">
-                    <label for="Subject" class="filter-label">Subject</label>
-                    {{form.subject(class="filter-field")}}
-                    <label for="NCEA Level" class="filter-label">Level</label>
-                    {{form.level(class="filter-field")}}
-                    <label for="Assessment Type" class="filter-label">Assessment Type</label>
-                    {{form.assess_type(class="filter-field")}}
-                    <label for="Ethnicity" class="filter-label">Ethnicity</label>
-                    {{form.ethnicity(class="filter-field")}}
-                    {{form.submit()}}
-                    {{form.csrf_token}}
+        <div class="info-box">
+            <h2>Info</h2>
+            <div id="info-list" style="display: none;">
+                <p>test</p>
+            </div>
+            <div class="centred-content">
+                <div class="chart-container">
+                    <canvas id="NCEAgraph"></canvas>
                 </div>
-            </form>
-        </div>
-    </div>
-        <div class="centred-content">
-            <div class="chart-container">
-                <canvas id="NCEAgraph"></canvas>
             </div>
         </div>
+    </div>
     {% with messages = get_flashed_messages() %}
         {% if messages|length > 0 %}
             <dialog open class="flash-dialog">
@@ -44,6 +54,19 @@
     {% if graph %}
     {% block javascript %}
         <script>
+            infoButton = document.getElementById("show-info-button");
+            hideButton = document.getElementById("hide-info-button");
+            infoList = document.getElementById("info-list");
+            function showInfo() {
+                infoButton.style.display = "none";
+                hideButton.style.display = "block";
+                infoList.style.display = "block";
+            }
+            function hideInfo() {
+                infoButton.style.display = "block";
+                hideButton.style.display = "none";
+                infoList.style.display = "none";
+            }
             graph = JSON.parse({{info | tojson}});
             new Chart("NCEAgraph", {
                 type: "bar",
@@ -100,6 +123,6 @@
             }
             });
         </script>
-    {% endblock %}
+        {% endblock %}
     {% endif %}
 {% endblock %}
