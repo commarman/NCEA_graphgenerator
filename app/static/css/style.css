@@ -217,6 +217,9 @@ h1, h2 {
     width: 500px;
 }
 
+.simple-list {
+    list-style-type: none;
+}
 
 
 /* Dialog Boxes*/

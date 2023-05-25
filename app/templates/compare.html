@@ -35,9 +35,11 @@
                     <button onclick="hideInfo()" id="hide-info-button">Hide Additional Information</button>
                 <div id="info-list">
                     <h3>Entries</h3>
-                    {% for year, value in additional["entries"] %}
-                        <p>{{year}}: {{value}}</p>
-                    {% endfor %}
+                    <ul class="simple-list">
+                        {% for year, value in additional["entries"] %}
+                            <li>{{year}}: {{value}}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
                 {% endif %}
                 <div class="centred-content">

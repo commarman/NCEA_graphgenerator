@@ -93,7 +93,6 @@ def retrieve_graph_data():
         ethnicity = form.ethnicity.data
 
         base_results = models.Result.query.filter_by(grouping_id = 1)
-        print(subject)
         if subject != "No filter":
             subject_id = models.Subject.query.filter_by(name = subject).first_or_404().id
             base_results = base_results.filter_by(subject_id = subject_id)
