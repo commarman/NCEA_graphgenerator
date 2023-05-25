@@ -74,10 +74,10 @@ def render_graph(result_years, subject, title, entry_totals):
     achieved = [value[0] for value in values]
     merit = [value[1] for value in values]
     excellence = [value[2] for value in values]
-    graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, 
-                  "entries": entry_totals, "title":title}
+    graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title}
+    additional_dict = {"entries": entry_totals}
     graph_data = json.dumps(graph_dict)
-    return render_template("compare.html", form = form, page="graph", info = graph_data, graph = True)
+    return render_template("compare.html", form = form, page="graph", info = graph_data, graph = True, additional = additional_dict)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])
@@ -92,7 +92,7 @@ def retrieve_graph_data():
         level = form.level.data
         ethnicity = form.ethnicity.data
 
-        base_results = models.Result.query
+        base_results = models.Result.query.filter_by(grouping_id = 1)
         print(subject)
         if subject != "No filter":
             subject_id = models.Subject.query.filter_by(name = subject).first_or_404().id
@@ -118,13 +118,12 @@ def retrieve_graph_data():
         total_years = {}
         for result in base_results:
             year = result.year.year
-            total_years[year] = total_years.get(year, 0) + result.total_entries
         percent_tuples = []
-        for year in total_years.keys():
-            computed_values = np.round(result_years[year] / total_years[year] * 100)
+        for year in total_entries.keys():
+            computed_values = np.round(result_years[year] / total_entries[year] * 100)
             percent_tuples.append((year, (list(computed_values))))
         percent_tuples.sort()
-        print(percent_tuples)
+        total_entries = [(year, entries) for year, entries in total_entries.items()]
         return render_graph(percent_tuples, subject, title, total_entries)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")

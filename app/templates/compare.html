@@ -24,19 +24,26 @@
                     </div>
                 </form>
             </div>
-            {% if graph %}
-                <button onclick="showInfo()" id="show-info-button">Show Additional Information</button>
-                <button onclick="hideInfo()" id="hide-info-button" style="display: none;">Hide Additional Information</button>
-            {% endif %}
         </div>
         <div class="info-box">
-            <h2>Info</h2>
-            <div id="info-list" style="display: none;">
-                <p>test</p>
-            </div>
-            <div class="centred-content">
-                <div class="chart-container">
-                    <canvas id="NCEAgraph"></canvas>
+            <h2>Graph Display:</h2>
+                {% if not graph %}
+                    <p>No graph generated.</p>
+                {% endif %}
+                {% if graph %}
+                    <button onclick="showInfo()" id="show-info-button"  style="display: none;">Show Additional Information</button>
+                    <button onclick="hideInfo()" id="hide-info-button">Hide Additional Information</button>
+                <div id="info-list">
+                    <h3>Entries</h3>
+                    {% for year, value in additional["entries"] %}
+                        <p>{{year}}: {{value}}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="centred-content">
+                    <div class="chart-container">
+                        <canvas id="NCEAgraph"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,9 +98,11 @@
             options : {
                 scales: {
                     y: {
+                        beginAtZero: true,
                         min: 0,
                         max: 100,
                         ticks: {
+                            stepSize: 5,
                             callback: function(value) {
                                 return value + "%"
                             }
