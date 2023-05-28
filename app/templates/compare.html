@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="page-content">
-        <div class="info-box">
+        <div class="info-box no-align">
             <h1>Graph Comparison</h1>
             <p class="info-text">To compare data, first import data from NZQA</p>
             <div class="centred-content">
@@ -19,21 +19,25 @@
                         {{form.assess_type(class="filter-field")}}
                         <label for="Ethnicity" class="filter-label">Ethnicity</label>
                         {{form.ethnicity(class="filter-field")}}
-                        {{form.submit()}}
+                        <label for="Comparison" class="filter-label">Comparison Type</label>
+                        {{form.compare(class="filter-field")}}
+                        {{form.submit(class="form-button")}}
                         {{form.csrf_token}}
                     </div>
                 </form>
             </div>
         </div>
-        <div class="info-box">
+        <div class="info-box no-align">
             <h2>Graph Display:</h2>
                 {% if not graph %}
                     <p>No graph generated.</p>
                 {% endif %}
                 {% if graph %}
-                    <button onclick="showInfo()" id="show-info-button"  style="display: none;">Show Additional Information</button>
-                    <button onclick="hideInfo()" id="hide-info-button">Hide Additional Information</button>
+                    <button onclick="showInfo()" id="show-info-button"  style="display: none;" class="form-button">Show Additional Information</button>
+                    <button onclick="hideInfo()" id="hide-info-button"  class="form-button">Hide Additional Information</button>
                 <div id="info-list">
+                    <p>The data below represents the proportion of grades for entries into standards.</p>
+                    <p>Each entry represents one person entering one standard.</p>
                     <h3>Entries</h3>
                     <ul class="simple-list">
                         {% for year, value in additional["entries"] %}
@@ -77,61 +81,86 @@
                 infoList.style.display = "none";
             }
             graph = JSON.parse({{info | tojson}});
+            var chartData = { 
+                labels: graph["labels"],
+                datasets : [
+                {
+                    label: "Excellence",
+                    data: graph["achieved"],
+                    backgroundColor: 'rgb(245, 197, 66)',
+                    stack: "Burnside"
+                },
+                {
+                    label: "Merit",
+                    data: graph["merit"],
+                    backgroundColor: 'rgb(66, 123, 245)',
+                    stack: "Burnside"
+                },{
+                    label: "Achieved",
+                    data: graph["achieved"],
+                    backgroundColor: 'rgb(245, 72, 66)',
+                    stack: "Burnside"
+                },
+                {% if comparison %}
+                {
+                    label: "Decile 8-10 Excellence",
+                    data: graph["comp_excellence"],
+                    backgroundColor: 'rgb(252, 127, 3)',
+                    stack: "Decile 8-10"
+                },
+                {
+                    label: "Decile 8-10 Merit",
+                    data: graph["comp_merit"],
+                    backgroundColor: 'rgb(30, 92, 227)',
+                    stack: "Decile 8-10"
+                },{
+                    label: "Decile 8-10 Achieved",
+                    data: graph["comp_achieved"],
+                    backgroundColor: 'rgb(217, 34, 28)',
+                    stack: "Decile 8-10"
+                },
+                {% endif %}
+                ],
+            }
             new Chart("NCEAgraph", {
                 type: "bar",
-                data : {
-                    labels: graph["labels"],
-                    datasets : [
-                    {
-                        label: "Excellence",
-                        data: graph["excellence"],
-                        backgroundColor: 'rgb(245, 197, 66)',
-                    },
-                    {
-                        label: "Merit",
-                        data: graph["merit"],
-                        backgroundColor: 'rgb(66, 123, 245)',
-                    },{
-                        label: "Achieved",
-                        data: graph["achieved"],
-                        backgroundColor: 'rgb(245, 72, 66)',
-                    },],
-                },
-            options : {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 100,
-                        ticks: {
-                            stepSize: 5,
-                            callback: function(value) {
-                                return value + "%"
+                data : chartData,
+                options : {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                stepSize: 5,
+                                callback: function(value) {
+                                    return value + "%"
+                                }
+                            },
+                            title : {
+                                display: true,
+                                text: "Percentage"
                             }
                         },
-                        title : {
-                            display: true,
-                            text: "Percentage"
+                        x : {
+                            stacked: true,
+                            title : {
+                                display: true,
+                                text: "Year"
+                            }
                         }
                     },
-                    x : {
-                        stacked: true,
+                    plugins: {
                         title : {
                             display: true,
-                            text: "Year"
+                            text: graph["title"]
+                        },
+                        legend : {
+                            position: "top"
                         }
                     }
-                },
-                plugins: {
-                    title : {
-                        display: true,
-                        text: graph["title"]
-                    },
-                },
-                legend : {
-                    display: true
                 }
-            }
             });
         </script>
         {% endblock %}

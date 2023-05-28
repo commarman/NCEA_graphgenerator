@@ -12,6 +12,7 @@ def create_filter_form(subjects, ethnicities):
         assess_type = SelectField("Assessment Type", choices=["No filter","Internal", "External"])
         ethnicity = SelectField("Ethnicity", choices=["No filter"] + ethnicities)
         level = SelectField("NCEA Level", choices=["No filter", "Level 1", "Level 2", "Level 3"])
+        compare = SelectField("Comparison", choices=["No Comparison", "Decile 8-10 Comparison"])
         submit = SubmitField("Generate")
 
     return FilterForm()

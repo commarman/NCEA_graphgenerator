@@ -69,15 +69,23 @@ def read_data():
 def render_graph(result_years, subject, title, entry_totals):
     """Render the html page with a graph."""
     form = construct_filter_form()
-    years = [result[0] for result in result_years]
-    values = [result[1] for result in result_years]
-    achieved = [value[0] for value in values]
-    merit = [value[1] for value in values]
-    excellence = [value[2] for value in values]
-    graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title}
+    years = [result[0] for result in result_years[0]]
+    bhs_values = [result[1] for result in result_years[0]]
+    achieved = [value[0] for value in bhs_values]
+    merit = [value[1] for value in bhs_values]
+    excellence = [value[2] for value in bhs_values]
+    if len(result_years[1]) > 0:
+        comp_values = [result[1] for result in result_years[1]]
+        comp_a = [value[0] for value in comp_values]
+        comp_m = [value[1] for value in comp_values]
+        comp_e = [value[2] for value in comp_values]
+        graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title,
+                    "comp_achieved":comp_a, "comp_merit": comp_m, "comp_excellence":comp_e}
+    else:
+        graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title}
     additional_dict = {"entries": entry_totals}
     graph_data = json.dumps(graph_dict)
-    return render_template("compare.html", form = form, page="graph", info = graph_data, graph = True, additional = additional_dict)
+    return render_template("compare.html", form = form, page="graph", info = graph_data, graph = True, additional = additional_dict, comparison = len(result_years[1]) > 0)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])
@@ -91,38 +99,56 @@ def retrieve_graph_data():
         assess_type = form.assess_type.data
         level = form.level.data
         ethnicity = form.ethnicity.data
+        comparative = form.compare.data
 
         base_results = models.Result.query.filter_by(grouping_id = 1)
+        comp_results = models.Result.query.filter_by(grouping_id = 2)
         if subject != "No filter":
             subject_id = models.Subject.query.filter_by(name = subject).first_or_404().id
             base_results = base_results.filter_by(subject_id = subject_id)
+            comp_results = comp_results.filter_by(subject_id = subject_id)
         if assess_type != "No filter":
             assess_code = 1 if assess_type == "External" else 0
             base_results = base_results.filter_by(external = assess_code)
+            comp_results = comp_results.filter_by(external = assess_code)
         if ethnicity != "No filter":
             ethnicity_id = models.Ethnicity.query.filter_by(name = ethnicity).first_or_404().id
             base_results = base_results.filter_by(ethnicity_id = ethnicity_id)
+            comp_results = comp_results.filter_by(ethnicity_id = ethnicity_id)
         if level != "No filter":
             base_results = base_results.filter_by(level = int(level.split(" ")[1])) #  Level is received in format 'Level X'
+            comp_results = comp_results.filter_by(level = int(level.split(" ")[1]))
         
-        title = f"Burnside {level} {subject} {assess_type} results for {ethnicity} students"
+        if comparative == "Decile 8-10 Comparison":
+            title = f"Burnside against Decile 8-10 {level} {subject} {assess_type} results for {ethnicity} students"
+        else:
+            title = f"Burnside {level} {subject} {assess_type} results for {ethnicity} students"
         title = re.sub("No filter ", "", title)  # Use regex to remove 'No filter' appearances.
 
-        total_entries = {}
-        result_years = {}
-        for result in base_results:
-            year = result.year.year
-            result_years[year] = result_years.get(year, np.zeros(3)) + np.array([result.achieved + result.merit + result.excellence, result.merit + result.excellence, result.excellence])
-            total_entries[year] = total_entries.get(year, 0) + result.total_entries
+        total_entries_bhs = {}
+        total_entries_decile = {}
+        bhs_results = {}
+        decile_results = {}
         total_years = {}
+        percent_tuples = [[],[]]
         for result in base_results:
             year = result.year.year
-        percent_tuples = []
-        for year in total_entries.keys():
-            computed_values = np.round(result_years[year] / total_entries[year] * 100)
-            percent_tuples.append((year, (list(computed_values))))
-        percent_tuples.sort()
-        total_entries = [(year, entries) for year, entries in total_entries.items()]
+            bhs_results[year] = bhs_results.get(year, np.zeros(3)) + np.array([result.achieved, result.merit, result.excellence])
+            total_entries_bhs[year] = total_entries_bhs.get(year, 0) + result.total_entries
+        for year in total_entries_bhs.keys():
+            computed_values = np.round(bhs_results[year] / total_entries_bhs[year] * 100)
+            percent_tuples[0].append((year, (list(computed_values))))
+        if comparative == "Decile 8-10 Comparison":
+            for result in comp_results:
+                year = result.year.year
+                decile_results[year] = decile_results.get(year, np.zeros(3)) + np.array([result.achieved, result.merit, result.excellence])
+                total_entries_decile[year] = total_entries_decile.get(year, 0) + result.total_entries
+            for year in total_entries_decile.keys():
+                computed_values = np.round(decile_results[year] / total_entries_decile[year] * 100)
+                percent_tuples[1].append((year, (list(computed_values))))
+        percent_tuples[0].sort()
+        percent_tuples[1].sort()
+        total_entries = [(year, entries) for year, entries in total_entries_bhs.items()]
         return render_graph(percent_tuples, subject, title, total_entries)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")
