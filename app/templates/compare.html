@@ -86,7 +86,7 @@
                 datasets : [
                 {
                     label: "Excellence",
-                    data: graph["achieved"],
+                    data: graph["excellence"],
                     backgroundColor: 'rgb(245, 197, 66)',
                     stack: "Burnside"
                 },
@@ -99,6 +99,12 @@
                     label: "Achieved",
                     data: graph["achieved"],
                     backgroundColor: 'rgb(245, 72, 66)',
+                    stack: "Burnside"
+                },
+                {
+                    label: "Not achieved",
+                    data: graph["not_achieved"],
+                    backgroundColor: 'rgb(110,110,110)',
                     stack: "Burnside"
                 },
                 {% if comparison %}
@@ -117,6 +123,12 @@
                     label: "Decile 8-10 Achieved",
                     data: graph["comp_achieved"],
                     backgroundColor: 'rgb(217, 34, 28)',
+                    stack: "Decile 8-10"
+                },
+                {
+                    label: "Decile 8-10 Not achieved",
+                    data: graph["comp_not_achieved"],
+                    backgroundColor: 'rgb(100,100,100)',
                     stack: "Decile 8-10"
                 },
                 {% endif %}

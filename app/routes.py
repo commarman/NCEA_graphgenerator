@@ -71,18 +71,20 @@ def render_graph(result_years, subject, title, entry_totals):
     form = construct_filter_form()
     years = [result[0] for result in result_years[0]]
     bhs_values = [result[1] for result in result_years[0]]
-    achieved = [value[0] for value in bhs_values]
-    merit = [value[1] for value in bhs_values]
-    excellence = [value[2] for value in bhs_values]
+    not_achieved = [value[0] for value in bhs_values]
+    achieved = [value[1] for value in bhs_values]
+    merit = [value[2] for value in bhs_values]
+    excellence = [value[3] for value in bhs_values]
     if len(result_years[1]) > 0:
         comp_values = [result[1] for result in result_years[1]]
-        comp_a = [value[0] for value in comp_values]
-        comp_m = [value[1] for value in comp_values]
-        comp_e = [value[2] for value in comp_values]
-        graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title,
-                    "comp_achieved":comp_a, "comp_merit": comp_m, "comp_excellence":comp_e}
+        comp_na = [result[0] for result in comp_values]
+        comp_a = [value[1] for value in comp_values]
+        comp_m = [value[2] for value in comp_values]
+        comp_e = [value[3] for value in comp_values]
+        graph_dict = {"labels":years, "not_achieved":not_achieved, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title,
+                      "comp_not_achieved": comp_na, "comp_achieved":comp_a, "comp_merit": comp_m, "comp_excellence":comp_e}
     else:
-        graph_dict = {"labels":years, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title}
+        graph_dict = {"labels":years, "not_achieved": not_achieved, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title}
     additional_dict = {"entries": entry_totals}
     graph_data = json.dumps(graph_dict)
     return render_template("compare.html", form = form, page="graph", info = graph_data, graph = True, additional = additional_dict, comparison = len(result_years[1]) > 0)
@@ -133,15 +135,16 @@ def retrieve_graph_data():
         percent_tuples = [[],[]]
         for result in base_results:
             year = result.year.year
-            bhs_results[year] = bhs_results.get(year, np.zeros(3)) + np.array([result.achieved, result.merit, result.excellence])
+            bhs_results[year] = bhs_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
             total_entries_bhs[year] = total_entries_bhs.get(year, 0) + result.total_entries
         for year in total_entries_bhs.keys():
+            a = bhs_results[year]/ total_entries_bhs[year]
             computed_values = np.round(bhs_results[year] / total_entries_bhs[year] * 100)
             percent_tuples[0].append((year, (list(computed_values))))
         if comparative == "Decile 8-10 Comparison":
             for result in comp_results:
                 year = result.year.year
-                decile_results[year] = decile_results.get(year, np.zeros(3)) + np.array([result.achieved, result.merit, result.excellence])
+                decile_results[year] = decile_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
                 total_entries_decile[year] = total_entries_decile.get(year, 0) + result.total_entries
             for year in total_entries_decile.keys():
                 computed_values = np.round(decile_results[year] / total_entries_decile[year] * 100)
