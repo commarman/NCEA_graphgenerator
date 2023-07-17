@@ -9,7 +9,7 @@ import re
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy()
-app.config ['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(basedir, "results.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(basedir, "results.db")
 db.init_app(app)
 import app.models as models
 app.config.from_pyfile('config.py')
@@ -19,6 +19,7 @@ app.config.from_pyfile('config.py')
 def home():
     """Render the home page."""
     return render_template("home.html", page="home")
+
 
 def construct_filter_form():
     """Construct a filter form."""
@@ -32,6 +33,7 @@ def construct_filter_form():
     ethnicity_list.sort()
     return create_filter_form(subject_names, ethnicity_list)
 
+
 @app.route("/nzqa-data")
 def nzqa_data():
     """Render the comparison graph generator page."""
@@ -39,7 +41,7 @@ def nzqa_data():
         flash("There is currently no data. Upload data first.")
         return redirect("/submit-nzqa")
     form = construct_filter_form()
-    return render_template("compare.html", form = form, page="graph", graph=False)
+    return render_template("compare.html", form=form, page="graph", graph=False)
 
 
 @app.route("/submit-nzqa", methods=["GET","POST"])
@@ -48,7 +50,8 @@ def submit_data():
 
     form = UploadForm()
 
-    return render_template("upload.html", form = form, page="upload")
+    return render_template("upload.html", form=form, page="upload")
+
 
 @app.route("/read-data", methods=["POST"])
 def read_data():
@@ -81,13 +84,13 @@ def render_graph(result_years, subject, title, entry_totals):
         comp_a = [value[1] for value in comp_values]
         comp_m = [value[2] for value in comp_values]
         comp_e = [value[3] for value in comp_values]
-        graph_dict = {"labels":years, "not_achieved":not_achieved, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title,
-                      "comp_not_achieved": comp_na, "comp_achieved":comp_a, "comp_merit": comp_m, "comp_excellence":comp_e}
+        graph_dict = {"labels": years, "not_achieved": not_achieved, "achieved": achieved, "merit": merit, "excellence": excellence, "subject": subject, "title": title,
+                      "comp_not_achieved": comp_na, "comp_achieved": comp_a, "comp_merit": comp_m, "comp_excellence": comp_e}
     else:
-        graph_dict = {"labels":years, "not_achieved": not_achieved, "achieved":achieved, "merit":merit, "excellence":excellence, "subject":subject, "title":title}
+        graph_dict = {"labels":years, "not_achieved": not_achieved, "achieved": achieved, "merit": merit, "excellence": excellence, "subject": subject, "title": title}
     additional_dict = {"entries": entry_totals}
     graph_data = json.dumps(graph_dict)
-    return render_template("compare.html", form = form, page="graph", info = graph_data, graph = True, additional = additional_dict, comparison = len(result_years[1]) > 0)
+    return render_template("compare.html", form=form, page="graph", info=graph_data, graph=True, additional=additional_dict, comparison=len(result_years[1]) > 0)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])
@@ -103,23 +106,23 @@ def retrieve_graph_data():
         ethnicity = form.ethnicity.data
         comparative = form.compare.data
 
-        base_results = models.Result.query.filter_by(grouping_id = 1)
-        comp_results = models.Result.query.filter_by(grouping_id = 2)
+        base_results = models.Result.query.filter_by(grouping_id=1)
+        comp_results = models.Result.query.filter_by(grouping_id=2)
         if subject != "No filter":
-            subject_id = models.Subject.query.filter_by(name = subject).first_or_404().id
-            base_results = base_results.filter_by(subject_id = subject_id)
-            comp_results = comp_results.filter_by(subject_id = subject_id)
+            subject_id = models.Subject.query.filter_by(name=subject).first_or_404().id
+            base_results = base_results.filter_by(subject_id=subject_id)
+            comp_results = comp_results.filter_by(subject_id=subject_id)
         if assess_type != "No filter":
             assess_code = 1 if assess_type == "External" else 0
-            base_results = base_results.filter_by(external = assess_code)
-            comp_results = comp_results.filter_by(external = assess_code)
+            base_results = base_results.filter_by(external=assess_code)
+            comp_results = comp_results.filter_by(external=assess_code)
         if ethnicity != "No filter":
-            ethnicity_id = models.Ethnicity.query.filter_by(name = ethnicity).first_or_404().id
-            base_results = base_results.filter_by(ethnicity_id = ethnicity_id)
-            comp_results = comp_results.filter_by(ethnicity_id = ethnicity_id)
+            ethnicity_id = models.Ethnicity.query.filter_by(name=ethnicity).first_or_404().id
+            base_results = base_results.filter_by(ethnicity_id=ethnicity_id)
+            comp_results = comp_results.filter_by(ethnicity_id=ethnicity_id)
         if level != "No filter":
-            base_results = base_results.filter_by(level = int(level.split(" ")[1])) #  Level is received in format 'Level X'
-            comp_results = comp_results.filter_by(level = int(level.split(" ")[1]))
+            base_results = base_results.filter_by(level=int(level.split(" ")[1]))  # Level is received in format 'Level X'
+            comp_results = comp_results.filter_by(level=int(level.split(" ")[1]))
         
         if comparative == "Decile 8-10 Comparison":
             title = f"Burnside against Decile 8-10 {level} {subject} {assess_type} results for {ethnicity} students"
@@ -131,15 +134,14 @@ def retrieve_graph_data():
         total_entries_decile = {}
         bhs_results = {}
         decile_results = {}
-        total_years = {}
-        percent_tuples = [[],[]]
+        percent_tuples = [[], []]
         for result in base_results:
             year = result.year.year
             bhs_results[year] = bhs_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
             total_entries_bhs[year] = total_entries_bhs.get(year, 0) + result.total_entries
         for year in total_entries_bhs.keys():
-            a = bhs_results[year]/ total_entries_bhs[year]
-            computed_values = np.round(bhs_results[year] / total_entries_bhs[year] * 100)
+            proportion = bhs_results[year] / total_entries_bhs[year]
+            computed_values = np.round(proportion * 100)
             percent_tuples[0].append((year, (list(computed_values))))
         if comparative == "Decile 8-10 Comparison":
             for result in comp_results:
@@ -155,6 +157,7 @@ def retrieve_graph_data():
         return render_graph(percent_tuples, subject, title, total_entries)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")
+
 
 if __name__ == "__main__":
     app.run(debug=True)

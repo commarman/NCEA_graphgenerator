@@ -1,5 +1,5 @@
-from csv import excel
 from app.routes import db
+
 
 class Ethnicity(db.Model):
     __tablename__ = "Ethnicity"
@@ -9,6 +9,7 @@ class Ethnicity(db.Model):
     def __init__(self, name):
         self.name = name
 
+
 class AcademicYear(db.Model):
     __tablename__ = "AcademicYear"
     id = db.Column(db.Integer, primary_key=True)
@@ -16,6 +17,7 @@ class AcademicYear(db.Model):
 
     def __init__(self, year):
         self.year = year
+
 
 class Subject(db.Model):
     __tablename__ = "Subject"
@@ -25,6 +27,7 @@ class Subject(db.Model):
     def __init__(self, name):
         self.name = name
 
+
 class Grouping(db.Model):
     __tablename__ = "Grouping"
     id = db.Column(db.Integer, primary_key=True)
@@ -32,6 +35,7 @@ class Grouping(db.Model):
 
     def __init__(self, name):
         self.name = name
+
 
 class Result(db.Model):
     __tablename__ = "Result"
@@ -54,19 +58,6 @@ class Result(db.Model):
     year = db.relationship("AcademicYear")
     group = db.relationship("Grouping")
 
-    # def __init__(self, values):
-    #     self.subject_id = values["subject_id"]
-    #     self.year_id = values["year_id"]
-    #     self.ethnicity_id = values["ethnicity_id"]
-    #     self.grouping_id = values["grouping_id"]
-    #     self.level = values["level"]
-    #     self.external = values["external"]
-    #     self.total_entries = values["total_entries"]
-    #     self.assessed = values["assessed"]
-    #     self.not_achieved = values["not_achieved"]
-    #     self.achieved = values["achieved"]
-    #     self.merit = values["merit"]
-    #     self.excellence = values["excellence"]
     def __init__(self, subject_id, year_id, ethnicity_id, grouping_id, level, external,
                  total_entries, assessed, not_achieved, achieved, merit, excellence):
         self.subject_id = subject_id
