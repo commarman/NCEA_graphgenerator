@@ -1,14 +1,16 @@
+"""Functions for uploading data to the database."""
+import numpy as np
 EXT_ASSESS = "Externally Assessed"
 BHS_NAME = "Burnside High School"
 NATIONAL_NAME = "National"
 
-import numpy as np
 
 def read_csv(csv_file):
     """Read the csv file."""
     lines = csv_file.readlines()
     lines = [line.decode("utf-8").split(",") for line in lines]
     return lines[4:] # First four lines are headers.
+
 
 def add_categories(csv_file, db, models):
     """Add missing categories for subject, year, etc."""
@@ -20,10 +22,7 @@ def add_categories(csv_file, db, models):
         if line[5] != '0':  # Column 5 is the number of BHS entries.
             subjects.add(line[0].capitalize())
             ethnicities.add(line[2])
-            try:
-                years.add(line[4])
-            except:
-                print(line)
+            years.add(line[4])
 
     # Add new categories if they don't already exist.
     for subject in subjects:
@@ -42,11 +41,11 @@ def add_categories(csv_file, db, models):
 
 def add_results(csv_file, db, models):
     """Add results from a csv file.
-       Assumes all subjects, ethnicities, and years already exist in the corresponding
-       table."""
+       Assumes all subjects, ethnicities, and years
+       already exist in the corresponding table."""
 
     csv_file = np.array(csv_file)
-    used_lines = csv_file[(csv_file[:,5] != '0')]
+    used_lines = csv_file[(csv_file[:, 5] != '0')]
     for line in used_lines:
         subject, level, ethnicity, assess_type, year = line[:5]
         bhs_results = line[5:18]
@@ -54,8 +53,8 @@ def add_results(csv_file, db, models):
 
         # Get values.
         subject_id = models.Subject.query.filter_by(name=subject.capitalize())[0].id
-        ethnicity_id = models.Ethnicity.query.filter_by(name = ethnicity)[0].id
-        year_id = models.AcademicYear.query.filter_by(year = year)[0].id
+        ethnicity_id = models.Ethnicity.query.filter_by(name=ethnicity)[0].id
+        year_id = models.AcademicYear.query.filter_by(year=year)[0].id
         level = int(level.split(" ")[1])
         external = (assess_type == EXT_ASSESS)
         bhs_entries = bhs_results[0]
@@ -75,10 +74,10 @@ def add_results(csv_file, db, models):
         comp_id = models.Grouping.query.filter_by(name=NATIONAL_NAME)[0].id
 
         bhs_result = models.Result(subject_id, year_id, ethnicity_id, bhs_id,level, external, 
-        bhs_entries, bhs_assessed, bhs_na, bhs_a, bhs_m, bhs_e)
+                                   bhs_entries, bhs_assessed, bhs_na, bhs_a, bhs_m, bhs_e)
 
         comp_result = models.Result(subject_id, year_id, ethnicity_id, comp_id, level, external, 
-        comp_entries, comp_assessed, comp_na, comp_a, comp_m, comp_e)
+                                    comp_entries, comp_assessed, comp_na, comp_a, comp_m, comp_e)
         db.session.add(bhs_result)
         db.session.add(comp_result)
     db.session.commit()
