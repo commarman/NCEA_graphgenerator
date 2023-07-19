@@ -28,9 +28,9 @@
             </div>
         </div>
         <div class="info-box no-align">
-            <h2>Graph Display:</h2>
+            <h1>Graph Display</h1>
                 {% if not graph %}
-                    <p>No graph generated.</p>
+                    <p class="info-text">No graph generated.</p>
                 {% endif %}
                 {% if graph %}
                     <button onclick="showInfo()" id="show-info-button"  style="display: none;" class="form-button">Show Additional Information</button>
@@ -40,9 +40,17 @@
                     <p>Each entry represents one person entering one standard.</p>
                     <h3>Entries</h3>
                     <ul class="simple-list">
-                        {% for year, value in additional["entries"] %}
-                            <li>{{year}}: {{value}}</li>
-                        {% endfor %}
+                        <table>
+                            <tr>
+                                <th>Year</th>
+                                <th>Number of Entries</th>
+                            </tr>
+                            {% for year, value in additional["entries"] %}
+                                <tr>
+                                    <td>{{year}}</td>
+                                    <td>{{value}}</td>
+                            {% endfor %}
+                        </table>
                     </ul>
                 </div>
                 {% endif %}
