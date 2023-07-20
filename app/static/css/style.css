@@ -245,7 +245,22 @@ h1, h2 {
     from {top:-300px; opacity:0}
     to {top:0; opacity:1}
   }
-  
+
+
+/* 404 page */
+.big-header {
+    font-size: min(5rem, 100px);
+    text-align: center;
+}
+
+.big-subtitle {
+    font-size: min(3rem, 60px);
+    text-align: center;
+}
+
+.horizontal-centering {
+    text-align: center;
+}
 
 /* Footer */
 footer {

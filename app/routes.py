@@ -15,11 +15,16 @@ import app.models as models
 app.config.from_pyfile('config.py')
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    """Render the 404 page."""
+    return render_template("404.html")
+
+
 @app.route("/")
 def home():
     """Render the home page."""
     return render_template("home.html", page="home")
-
 
 def construct_filter_form():
     """Construct a filter form."""

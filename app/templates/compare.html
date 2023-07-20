@@ -31,6 +31,8 @@
             <h1>Graph Display</h1>
                 {% if not graph %}
                     <p class="info-text">No graph generated.</p>
+                {% else %}
+                    <p class="info-text">Graph</p>
                 {% endif %}
                 {% if graph %}
                     <button onclick="showInfo()" id="show-info-button"  style="display: none;" class="form-button">Show Additional Information</button>
