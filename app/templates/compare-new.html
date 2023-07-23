@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div id="sideMenu" class="side-menu">
+        <a class="closebtn" onclick="closeMenu()">&times;</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Clients</a>
+        <a href="#">Contact</a>
+        <div class="side-bar"></div>
+    </div>
+    <span onclick="openMenu()">open</span>
+    <script>
+        function openMenu() {
+            document.getElementById("sideMenu").style.width = "250px";
+        }
+        function closeMenu() {
+            document.getElementById("sideMenu").style.width = "0px";
+        }
+    </script>
+{% endblock %}

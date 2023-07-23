@@ -30,6 +30,7 @@ header {
     background-color: var(--burnside-green);
     padding-top: 5px;
     padding-bottom: 5px;
+    z-index: 2;
 }
 
 /* ul*/
@@ -247,6 +248,32 @@ h1, h2 {
   }
 
 
+/* Side Menu.
+   Based on W3 Schools */
+.side-menu {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: white;
+    overflow-x: hidden;
+    padding-top: 60px;
+    transition: 0.5s;
+}
+
+.side-bar {
+    height: 100%;
+    width: 20px;
+    position: fixed;
+    z-index: 1;
+    overflow-x: visible;
+    background-color: var(--lighter-green);
+    padding-top: 60px;
+    transition: 0.5s;
+}
+
 /* 404 page */
 .big-header {
     font-size: min(5rem, 100px);
@@ -266,6 +293,7 @@ h1, h2 {
 footer {
     margin-top: auto;
     background-color: var(--burnside-green);
+    z-index: 2;
 }
 
 .footer-text {
