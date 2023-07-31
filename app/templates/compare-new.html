@@ -2,7 +2,7 @@
 {% block content %}
     <div id="sideMenu" class="side-menu">
         <h1>Generate</h1>
-        <form action="/retrieve-graph-data" method="post">
+        <form action="/retrieve-graph-data" method="post" class="filter-form">
             <div class="form-content">
                 <label for="Subject" class="filter-label">Subject</label>
                 {{form.subject(class="filter-field")}}
@@ -35,8 +35,8 @@
                 document.getElementById("sideOpen").style.left = "0px";
                 document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
             } else {
-                document.getElementById("sideMenu").style.width = "400px";
-                document.getElementById("sideOpen").style.left = "400px";
+                document.getElementById("sideMenu").style.width = "min(400px, 90vw)";
+                document.getElementById("sideOpen").style.left = "min(400px, 90vw)";
                 document.getElementById("arrowImage").src = "/static/icons/down-arrow.png";
             }
             menuOpen = !menuOpen;

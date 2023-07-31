@@ -75,7 +75,7 @@ h1, h2 {
 .section-box {
     border: 3px solid black;
     border-radius: 10px;
-    width: min(400px, 90vw);
+    width: min(400px, 50vw);
     height: 400px;
     text-align: center;
     background-color: white;
@@ -116,7 +116,7 @@ h1, h2 {
     text-align: left;
     display: flex;
     flex-direction: column;
-    width: min(400px, 90vw);
+    width: min(400px, 50vw);
     align-self: center;
 }
 
@@ -188,11 +188,7 @@ h1, h2 {
     display: flex;
     flex-direction: column;
     text-align: center;
-    margin-top: 10px;
-    border: 1px solid black;
-    border-radius: 5px;
     width: min(400px, 90vw);
-    height: 400px;
     text-align: center;
     background-color: white;
 }
@@ -258,9 +254,13 @@ h1, h2 {
     top: 0;
     left: 0;
     background-color: white;
-    overflow-x: hidden;
+    overflow: hidden;
     padding-top: 60px;
     transition: 0.5s;
+}
+
+.side-menu > h1 {
+    width: min(400px, 90vw);
 }
 
 .side-bar {
