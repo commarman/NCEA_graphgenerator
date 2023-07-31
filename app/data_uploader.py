@@ -81,3 +81,4 @@ def add_results(csv_file, db, models):
         db.session.add(bhs_result)
         db.session.add(comp_result)
     db.session.commit()
+

@@ -95,7 +95,7 @@ def render_graph(result_years, subject, title, entry_totals):
         graph_dict = {"labels":years, "not_achieved": not_achieved, "achieved": achieved, "merit": merit, "excellence": excellence, "subject": subject, "title": title}
     additional_dict = {"entries": entry_totals}
     graph_data = json.dumps(graph_dict)
-    return render_template("compare.html", form=form, page="graph", info=graph_data, graph=True, additional=additional_dict, comparison=len(result_years[1]) > 0)
+    return render_template("compare-new.html", form=form, page="graph", info=graph_data, graph=True, additional=additional_dict, comparison=len(result_years[1]) > 0)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])

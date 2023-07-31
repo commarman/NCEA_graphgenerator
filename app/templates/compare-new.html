@@ -41,5 +41,166 @@
             }
             menuOpen = !menuOpen;
         }
+        toggleMenu();
     </script>
+<div class="info-box">
+    <h1>Graph Display</h1>
+        {% if not graph %}
+            <p class="info-text">No graph generated.</p>
+        {% else %}
+            <p class="info-text">Graph</p>
+        {% endif %}
+        {% if graph %}
+            <button onclick="showInfo()" id="show-info-button"  style="display: none;" class="form-button">Show Additional Information</button>
+            <button onclick="hideInfo()" id="hide-info-button"  class="form-button">Hide Additional Information</button>
+        <div id="info-list">
+            <p>The data below represents the proportion of grades for entries into standards.</p>
+            <p>Each entry represents one person entering one standard.</p>
+            <h3>Entries</h3>
+            <ul class="simple-list">
+                <table>
+                    <tr>
+                        <th>Year</th>
+                        <th>Number of Entries</th>
+                    </tr>
+                    {% for year, value in additional["entries"] %}
+                        <tr>
+                            <td>{{year}}</td>
+                            <td>{{value}}</td>
+                    {% endfor %}
+                </table>
+            </ul>
+        </div>
+        {% endif %}
+        <div class="centred-content">
+            <div class="chart-container">
+                <canvas id="NCEAgraph"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% with messages = get_flashed_messages() %}
+{% if messages|length > 0 %}
+    <dialog open class="flash-dialog">
+        {% for message in messages %}
+            <p>{{message}}</p>
+        {% endfor %}
+        <button onclick="this.parentElement.close()">Close</button>
+    </dialog>
+{% endif %}
+{% endwith %}
+{% if graph %}
+{% block javascript %}
+<script>
+    infoButton = document.getElementById("show-info-button");
+    hideButton = document.getElementById("hide-info-button");
+    infoList = document.getElementById("info-list");
+    function showInfo() {
+        infoButton.style.display = "none";
+        hideButton.style.display = "block";
+        infoList.style.display = "block";
+    }
+    function hideInfo() {
+        infoButton.style.display = "block";
+        hideButton.style.display = "none";
+        infoList.style.display = "none";
+    }
+    graph = JSON.parse({{info | tojson}});
+    var chartData = { 
+        labels: graph["labels"],
+        datasets : [
+        {
+            label: "Excellence",
+            data: graph["excellence"],
+            backgroundColor: 'rgb(245, 197, 66)',
+            stack: "Burnside"
+        },
+        {
+            label: "Merit",
+            data: graph["merit"],
+            backgroundColor: 'rgb(66, 123, 245)',
+            stack: "Burnside"
+        },{
+            label: "Achieved",
+            data: graph["achieved"],
+            backgroundColor: 'rgb(245, 72, 66)',
+            stack: "Burnside"
+        },
+        {
+            label: "Not achieved",
+            data: graph["not_achieved"],
+            backgroundColor: 'rgba(110,110,110,0.5)',
+            stack: "Burnside"
+        },
+        {% if comparison %}
+        {
+            label: "Decile 8-10 Excellence",
+            data: graph["comp_excellence"],
+            backgroundColor: 'rgb(252, 127, 3)',
+            stack: "Decile 8-10"
+        },
+        {
+            label: "Decile 8-10 Merit",
+            data: graph["comp_merit"],
+            backgroundColor: 'rgb(30, 92, 227)',
+            stack: "Decile 8-10"
+        },{
+            label: "Decile 8-10 Achieved",
+            data: graph["comp_achieved"],
+            backgroundColor: 'rgb(217, 34, 28)',
+            stack: "Decile 8-10"
+        },
+        {
+            label: "Decile 8-10 Not achieved",
+            data: graph["comp_not_achieved"],
+            backgroundColor: 'rgba(100,100,100,0.5)',
+            stack: "Decile 8-10"
+        },
+        {% endif %}
+        ],
+    }
+    new Chart("NCEAgraph", {
+        type: "bar",
+        data : chartData,
+        options : {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        stepSize: 5,
+                        callback: function(value) {
+                            return value + "%"
+                        }
+                    },
+                    title : {
+                        display: true,
+                        text: "Percentage"
+                    }
+                },
+                x : {
+                    stacked: true,
+                    title : {
+                        display: true,
+                        text: "Year"
+                    }
+                }
+            },
+            plugins: {
+                title : {
+                    display: true,
+                    text: graph["title"]
+                },
+                legend : {
+                    position: "top"
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endif %}
 {% endblock %}
