@@ -46,7 +46,7 @@ def nzqa_data():
         flash("There is currently no data. Upload data first.")
         return redirect("/submit-nzqa")
     form = construct_filter_form()
-    return render_template("compare.html", form=form, page="graph", graph=False)
+    return render_template("compare-new.html", form=form, page="graph", graph=False)
 
 
 @app.route("/submit-nzqa", methods=["GET","POST"])

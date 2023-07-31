@@ -1,20 +1,45 @@
 {% extends "layout.html" %}
 {% block content %}
     <div id="sideMenu" class="side-menu">
-        <a class="closebtn" onclick="closeMenu()">&times;</a>
-        <a href="#">About</a>
-        <a href="#">Services</a>
-        <a href="#">Clients</a>
-        <a href="#">Contact</a>
-        <div class="side-bar"></div>
+        <h1>Generate</h1>
+        <form action="/retrieve-graph-data" method="post">
+            <div class="form-content">
+                <label for="Subject" class="filter-label">Subject</label>
+                {{form.subject(class="filter-field")}}
+                <label for="NCEA Level" class="filter-label">Level</label>
+                {{form.level(class="filter-field")}}
+                <label for="Assessment Type" class="filter-label">Assessment Type</label>
+                {{form.assess_type(class="filter-field")}}
+                <label for="Ethnicity" class="filter-label">Ethnicity</label>
+                {{form.ethnicity(class="filter-field")}}
+                <label for="Comparison" class="filter-label">Comparison Type</label>
+                {{form.compare(class="filter-field")}}
+                {{form.submit(class="form-button")}}
+                {{form.csrf_token}}
+            </div>
+        </form>
+    </div>
+    <div id="sideOpen" class="side-bar">
+        <a>
+            <a id="menuArrow" class="open-button" onclick="toggleMenu()">
+                <img id="arrowImage" width="50px" src="/static/icons/left-arrow.png"></img>
+            </a>
+        </a>
     </div>
     <span onclick="openMenu()">open</span>
     <script>
-        function openMenu() {
-            document.getElementById("sideMenu").style.width = "250px";
-        }
-        function closeMenu() {
-            document.getElementById("sideMenu").style.width = "0px";
+        var menuOpen = false;
+        function toggleMenu() {
+            if (menuOpen) {
+                document.getElementById("sideMenu").style.width = "0px";
+                document.getElementById("sideOpen").style.left = "0px";
+                document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
+            } else {
+                document.getElementById("sideMenu").style.width = "400px";
+                document.getElementById("sideOpen").style.left = "400px";
+                document.getElementById("arrowImage").src = "/static/icons/down-arrow.png";
+            }
+            menuOpen = !menuOpen;
         }
     </script>
 {% endblock %}
