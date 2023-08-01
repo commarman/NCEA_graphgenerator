@@ -27,23 +27,7 @@
         </a>
     </div>
     <span onclick="openMenu()">open</span>
-    <script>
-        var menuOpen = false;
-        function toggleMenu() {
-            if (menuOpen) {
-                document.getElementById("sideMenu").style.width = "0px";
-                document.getElementById("sideOpen").style.left = "0px";
-                document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
-            } else {
-                document.getElementById("sideMenu").style.width = "min(400px, 90vw)";
-                document.getElementById("sideOpen").style.left = "min(400px, 90vw)";
-                document.getElementById("arrowImage").src = "/static/icons/down-arrow.png";
-            }
-            menuOpen = !menuOpen;
-        }
-        toggleMenu();
-    </script>
-<div class="info-box">
+<div class="info-box" id="main">
     <h1>Graph Display</h1>
         {% if not graph %}
             <p class="info-text">No graph generated.</p>
@@ -78,6 +62,24 @@
             </div>
         </div>
     </div>
+    <script>
+        var menuOpen = false;
+        function toggleMenu() {
+            if (menuOpen) {
+                document.getElementById("sideMenu").style.width = "0px";
+                document.getElementById("sideOpen").style.left = "0px";
+                document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
+                document.getElementById("main").style.marginLeft = 0
+            } else {
+                document.getElementById("sideMenu").style.width = "min(400px, 90vw)";
+                document.getElementById("sideOpen").style.left = "min(400px, 90vw)";
+                document.getElementById("arrowImage").src = "/static/icons/down-arrow.png";
+                document.getElementById("main").style.marginLeft = "min(400px, 90vw)";
+            }
+            menuOpen = !menuOpen;
+        }
+        toggleMenu();
+    </script>
 </div>
 </div>
 {% with messages = get_flashed_messages() %}

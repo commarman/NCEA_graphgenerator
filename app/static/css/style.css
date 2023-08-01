@@ -202,16 +202,16 @@ h1, h2 {
 .filter-field {
     margin-inline: 5px;
     margin: 5px;
-    background-color: var(--lighter-green);
+    background-color: var(--grey-white);
     font-family:'Nunito Sans', sans-serif;
     font-size: min(3vw, 0.9rem);
-    color: white;
-    border: 2px solid var(--burnside-green);
+    color: black;
     border-radius: 2px;
 }
 
-.filter-field option {
+.filter-field > option {
     font-size: min(3vw, 0.9rem);
+    background-color: white;
 }
 
 .filter-label {
@@ -268,10 +268,15 @@ h1, h2 {
     width: 50px;
     left:0;
     position: fixed;
+    display:block;
     z-index: 1;
     overflow-x: visible;
     background-color: var(--lighter-green);
     padding-top: 60px;
+    transition: 0.5s;
+}
+
+#main {
     transition: 0.5s;
 }
 
