@@ -27,8 +27,12 @@
         </a>
     </div>
     <span onclick="openMenu()">open</span>
-<div class="info-box" id="main">
-    <h1>Graph Display</h1>
+<div class="main-box" id="main">
+    <div class="chart-container">
+        <canvas id="NCEAgraph"></canvas>
+    </div>
+    <div class="info-box no-align">
+        <h1>Graph Display</h1>
         {% if not graph %}
             <p class="info-text">No graph generated.</p>
         {% else %}
@@ -56,11 +60,7 @@
             </ul>
         </div>
         {% endif %}
-        <div class="centred-content">
-            <div class="chart-container">
-                <canvas id="NCEAgraph"></canvas>
-            </div>
-        </div>
+    </div>
     </div>
     <script>
         var menuOpen = false;
@@ -197,7 +197,7 @@
                     text: graph["title"]
                 },
                 legend : {
-                    position: "top"
+                    position: "bottom",
                 }
             }
         }

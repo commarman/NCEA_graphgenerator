@@ -4,12 +4,14 @@
 
 /* Variable declarations. */
 :root {
-    --background-color: rgb(238, 240, 242);
+    /*--background-color: rgb(238, 240, 242);*/
+    --background-color: white;
     --burnside-green: rgb(2, 96, 76);
     --lighter-green: rgb(33, 109, 79);
     --blue-color: rgb(23, 50, 72);
     --light-blue: rgb(34, 75, 109);
     --grey-white: rgb(218, 221, 216);
+    --dark-grey: rgb(54, 65, 62);
 }
 
 /* Body styling */
@@ -220,8 +222,9 @@ h1, h2 {
 }
 
 .chart-container {
-    width: 400px;
-    height: 400px;
+    width: max(400px,30vw);
+    height: max(400px,20vw);
+    align-self: center;
 }
 
 .simple-list {
@@ -271,13 +274,17 @@ h1, h2 {
     display:block;
     z-index: 1;
     overflow-x: visible;
-    background-color: var(--lighter-green);
+    background-color: var(--dark-grey);
     padding-top: 60px;
     transition: 0.5s;
 }
 
-#main {
+.main-box {
     transition: 0.5s;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    
 }
 
 .open-button {
