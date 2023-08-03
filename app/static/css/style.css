@@ -77,7 +77,7 @@ h1, h2 {
 .section-box {
     border: 3px solid black;
     border-radius: 10px;
-    width: min(400px, 50vw);
+    width: min(400px, 90vw);
     height: 400px;
     text-align: center;
     background-color: white;
@@ -118,7 +118,7 @@ h1, h2 {
     text-align: left;
     display: flex;
     flex-direction: column;
-    width: min(400px, 50vw);
+    width: min(400px, 90vw);
     align-self: center;
 }
 
@@ -264,7 +264,7 @@ h1, h2 {
     background-color: white;
     overflow: hidden;
     padding-top: 60px;
-    transition: 0.5s;
+    transition: 0.25s;
 }
 
 .side-menu > h1 {
@@ -281,7 +281,7 @@ h1, h2 {
     overflow-x: visible;
     background-color: var(--dark-grey);
     padding-top: 60px;
-    transition: 0.5s;
+    transition: 0.25s;
 }
 
 .main-box {
