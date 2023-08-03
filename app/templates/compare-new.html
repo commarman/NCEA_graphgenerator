@@ -26,10 +26,11 @@
             </a>
         </a>
     </div>
-    <span onclick="openMenu()">open</span>
 <div class="main-box" id="main">
-    <div class="chart-container">
-        <canvas id="NCEAgraph"></canvas>
+    <div class="info-box no-align">
+        <div class="chart-container">
+            <canvas id="NCEAgraph"></canvas>
+        </div>
     </div>
     <div class="info-box no-align">
         <h1>Graph Display</h1>
@@ -41,7 +42,7 @@
         {% if graph %}
             <button onclick="showInfo()" id="show-info-button"  style="display: none;" class="form-button">Show Additional Information</button>
             <button onclick="hideInfo()" id="hide-info-button"  class="form-button">Hide Additional Information</button>
-        <div id="info-list">
+        <div id="additional-info">
             <p>The data below represents the proportion of grades for entries into standards.</p>
             <p>Each entry represents one person entering one standard.</p>
             <h3>Entries</h3>
@@ -97,16 +98,18 @@
 <script>
     infoButton = document.getElementById("show-info-button");
     hideButton = document.getElementById("hide-info-button");
-    infoList = document.getElementById("info-list");
+    infoList = document.getElementById("additional-info");
     function showInfo() {
         infoButton.style.display = "none";
         hideButton.style.display = "block";
-        infoList.style.display = "block";
+        infoList.style.height = "500px";
+        //infoList.style.visibility = "visible";
     }
     function hideInfo() {
         infoButton.style.display = "block";
         hideButton.style.display = "none";
-        infoList.style.display = "none";
+        infoList.style.height = "0px";
+        //infoList.style.visibility = "hidden";
     }
     graph = JSON.parse({{info | tojson}});
     var chartData = { 

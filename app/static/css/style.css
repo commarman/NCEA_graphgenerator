@@ -140,6 +140,12 @@ h1, h2 {
     margin-bottom: 0.5em;
 }
 
+#additional-info {
+    overflow-y: hidden;
+    height:400px;
+    transition: 0.25s;
+}
+
 .centre-form {
     display: flex;
     flex-direction: column;
@@ -222,9 +228,8 @@ h1, h2 {
 }
 
 .chart-container {
-    width: max(400px,30vw);
-    height: max(400px,20vw);
-    align-self: center;
+    width: min(400px, 50vw);
+    height: min(400px, 50vw);
 }
 
 .simple-list {
@@ -283,8 +288,7 @@ h1, h2 {
     transition: 0.5s;
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    
+    justify-content: space-evenly;
 }
 
 .open-button {
