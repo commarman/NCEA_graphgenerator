@@ -60,7 +60,7 @@
             </div>
             {% endif %}
         </div>
-        <div class="info-box no-align">
+        <div>
             <div class="chart-container">
                 <canvas id="NCEAgraph"></canvas>
             </div>
@@ -74,12 +74,12 @@
                 document.getElementById("sideMenu").style.width = "0px";
                 document.getElementById("sideOpen").style.left = "0px";
                 document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
-                document.getElementById("main").style.marginLeft = 0
+                document.getElementById("main").style.marginLeft = "50px"
             } else {
                 document.getElementById("sideMenu").style.width = "min(400px, 90vw)";
                 document.getElementById("sideOpen").style.left = "min(400px, 90vw)";
                 document.getElementById("arrowImage").src = "/static/icons/down-arrow.png";
-                document.getElementById("main").style.marginLeft = "min(400px, 90vw)";
+                document.getElementById("main").style.marginLeft = "calc(min(400px, 90vw) + 50px)";
             }
             menuOpen = !menuOpen;
         }

@@ -228,8 +228,8 @@ h1, h2 {
 }
 
 .chart-container {
-    width: min(400px, 50vw);
-    height: min(400px, 50vw);
+    width: max(400px, 38vw);
+    height: max(300px, 30vw);
 }
 
 .simple-list {
@@ -285,10 +285,14 @@ h1, h2 {
 }
 
 .main-box {
-    transition: 0.5s;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+}
+
+#main {
+    transition: 0.3s;
+    margin-left: 50px;
 }
 
 .open-button {
@@ -321,4 +325,12 @@ footer {
     color: white;
     font-size: small;
     text-align: center;
+}
+
+
+/* Media Query*/
+@media screen and (max-width:1300px) {
+    body {
+        visibility: hidden;
+    }
 }
