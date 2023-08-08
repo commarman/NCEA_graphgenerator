@@ -31,18 +31,14 @@
         <h1>Graph Display</h1>
     </div>
     <div class="main-box">
-        <div class="info-box no-align">
+        <div class="small-info-box no-align">
             {% if not graph %}
                 <p class="info-text">No graph generated.</p>
-            {% else %}
-                <p class="info-text">Graph</p>
             {% endif %}
             {% if graph %}
                 <button onclick="showInfo()" id="show-info-button"  style="display: none;" class="form-button">Show Additional Information</button>
                 <button onclick="hideInfo()" id="hide-info-button"  class="form-button">Hide Additional Information</button>
             <div id="additional-info">
-                <p>The data below represents the proportion of grades for entries into standards.</p>
-                <p>Each entry represents one person entering one standard.</p>
                 <h3>Entries</h3>
                 <ul class="simple-list">
                     <table>
@@ -52,8 +48,8 @@
                         </tr>
                         {% for year, value in additional["entries"] %}
                             <tr>
-                                <td>{{year}}</td>
-                                <td>{{value}}</td>
+                                <td class="data-row">{{year}}</td>
+                                <td class="data-row">{{value}}</td>
                         {% endfor %}
                     </table>
                 </ul>

@@ -122,6 +122,13 @@ h1, h2 {
     align-self: center;
 }
 
+.small-info-box {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    width: min(300px, 30vw);
+}
+
 .info-box.no-align {
     align-self: auto;
 }
@@ -236,6 +243,11 @@ h1, h2 {
     list-style-type: none;
 }
 
+/* Rows for the information table.*/
+.data-row {
+    text-align: center;
+}
+
 
 /* Dialog Boxes*/
 
@@ -287,7 +299,7 @@ h1, h2 {
 .main-box {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: center;
 }
 
 #main {
@@ -325,12 +337,4 @@ footer {
     color: white;
     font-size: small;
     text-align: center;
-}
-
-
-/* Media Query*/
-@media screen and (max-width:1300px) {
-    body {
-        visibility: hidden;
-    }
 }
