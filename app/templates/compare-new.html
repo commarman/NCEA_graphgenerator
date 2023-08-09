@@ -7,13 +7,14 @@
                 <label for="Subject" class="filter-label">Subject</label>
                 {{form.subject(class="filter-field")}}
                 <label for="NCEA Level" class="filter-label">Level</label>
-                {{form.level(class="filter-field")}}
+                {{form.level(class="filter-field", id="level-field")}}
                 <label for="Assessment Type" class="filter-label">Assessment Type</label>
                 {{form.assess_type(class="filter-field")}}
                 <label for="Ethnicity" class="filter-label">Ethnicity</label>
-                {{form.ethnicity(class="filter-field")}}
+                {{form.ethnicity(class="filter-field", id="ethnicity-field")}}
                 <label for="Comparison" class="filter-label">Comparison Type</label>
-                {{form.compare(class="filter-field")}}
+                {{form.compare(class="filter-field", id="compare-field", onchange="changeForm()")}}
+                <input type="hidden" name="none" value="No filter" id="default-value">
                 {{form.submit(class="form-button")}}
                 {{form.csrf_token}}
             </div>
@@ -64,8 +65,32 @@
     </div>
     </div>
     <script>
+        compareField = document.getElementById("compare-field");
+        ethnicityField = document.getElementById("ethnicity-field");
+        levelField = document.getElementById("level-field");
+        defaultInput = document.getElementById("default-value");
+
+        function changeForm() {
+            ethnicityField.disabled = false;
+            levelField.disabled = false;
+            if (compareField.value == "Compare by Ethnicity") {
+                ethnicityField.disabled = true;
+                ethnicityField.value = "No filter";
+                defaultInput.name = "ethnicity";
+            } 
+            else if (compareField.value == "Compare by Level") {
+                levelField.disabled = true;
+                levelField.value = "No filter";
+                defaultInput.name = "level";
+            } else {
+                defaultInput.name = "none";
+            }
+        }
+
+        changeForm(); // Update when page is first loaded.
+
         var menuOpen = false;
-        function toggleMenu() {
+        function toggleMenu() { // Open and close the side menu.
             if (menuOpen) {
                 document.getElementById("sideMenu").style.width = "0px";
                 document.getElementById("sideOpen").style.left = "0px";

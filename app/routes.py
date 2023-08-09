@@ -129,8 +129,12 @@ def retrieve_graph_data():
             base_results = base_results.filter_by(level=int(level.split(" ")[1]))  # Level is received in format 'Level X'
             comp_results = comp_results.filter_by(level=int(level.split(" ")[1]))
         
-        if comparative == "Decile 8-10 Comparison":
+        if comparative == "Compare by Decile":
             title = f"Burnside against Decile 8-10 {level} {subject} {assess_type} results for {ethnicity} students"
+        elif comparative == "Compare by Ethnicity":
+            title = f"Burnside {level} {subject} {assess_type} results across Ethnicity"
+        elif comparative == "Compare by Level":
+            title = f"Burnside {subject} {assess_type} results across Level for {ethnicity} students"
         else:
             title = f"Burnside {level} {subject} {assess_type} results for {ethnicity} students"
         title = re.sub("No filter ", "", title)  # Use regex to remove 'No filter' appearances.
@@ -148,7 +152,7 @@ def retrieve_graph_data():
             proportion = bhs_results[year] / total_entries_bhs[year]
             computed_values = np.round(proportion * 100)
             percent_tuples[0].append((year, (list(computed_values))))
-        if comparative == "Decile 8-10 Comparison":
+        if comparative == "Compare by Decile":
             for result in comp_results:
                 year = result.year.year
                 decile_results[year] = decile_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
