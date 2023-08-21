@@ -74,25 +74,26 @@ def read_data():
         return redirect("/submit-nzqa")
 
 
-def render_graph(result_years, subject, title, entry_totals):
+def render_graph(graph, subject, title, entry_totals, set_count):
     """Render the html page with a graph."""
     form = construct_filter_form()
-    years = [result[0] for result in result_years[0]]
-    bhs_values = [result[1] for result in result_years[0]]
-    not_achieved = [value[0] for value in bhs_values]
-    achieved = [value[1] for value in bhs_values]
-    merit = [value[2] for value in bhs_values]
-    excellence = [value[3] for value in bhs_values]
-    graph_dict = {"labels": years, "title":title}
-    for i, result_set in enumerate(result_years):
-        grades = [result[1] for result in result_set]
-        graph_dict[f"not_achieved{i+1}"] = result_set[0]
-        graph_dict[f"achieved{i+1}"] = result_set[1]
-        graph_dict[f"merit{i+1}"] = result_set[2]
-        graph_dict[f"excellence{i+1}"] = result_set[3]
+    #years = [result[0] for result in result_years[0]]
+    #bhs_values = [result[1] for result in result_years[0]]
+    #not_achieved = [value[0] for value in bhs_values]
+    #achieved = [value[1] for value in bhs_values]
+    #merit = [value[2] for value in bhs_values]
+    #excellence = [value[3] for value in bhs_values]
+    #graph_dict = {"labels": years, "title":title}
+    #for i, result_set in enumerate(result_years):
+        #grades = [result[1] for result in result_set]
+        #graph_dict[f"not_achieved{i+1}"] = result_set[0]
+        #graph_dict[f"achieved{i+1}"] = result_set[1]
+        #graph_dict[f"merit{i+1}"] = result_set[2]
+        #graph_dict[f"excellence{i+1}"] = result_set[3]
     additional_dict = {"entries": entry_totals}
-    graph_data = json.dumps(graph_dict)
-    return render_template("compare-new.html", form=form, page="graph", info=graph_data, graph=True, additional=additional_dict, comparison=len(result_years) > 1)
+    print(graph)
+    graph_data = json.dumps(graph)
+    return render_template("compare-new.html", form=form, page="graph", info=graph_data, graph=True, additional=additional_dict, number_sets=set_count)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])
@@ -142,9 +143,8 @@ def retrieve_graph_data():
 
         base_results = base_results.all()
         # Convert results to graphable information.
-        result_dict= {}
+        result_dict = {}
         # Result dicts is a dict of each dataset being compared with by year and grade.
-        print(len(base_results))
         for result in base_results:
             year = result.year.year
             if comparative == "Compare by Ethnicity":
@@ -152,48 +152,60 @@ def retrieve_graph_data():
             elif comparative == "Compare by Level":
                 key = result.level
             elif comparative == "Compare by Decile":
-                key = result.group
-            current = result_dict.get(key, [])
+                key = result.group.name
+            else:
+                key = "Burnside"
+            current = result_dict.get(key, {})
             current[year] = current.get(year, np.zeros(5)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence, result.total_entries])
             result_dict[key] = current
         
         # Convert numbers to proportions.
-        i = 0
+        graph = {"years":[]}
         for key, dataset in result_dict.items():
             for year, grades in dataset.items():
                 proportion = grades / grades[4]  # Divide by total entries.
                 computed_values = np.round(proportion * 100)
                 dataset[year] = computed_values
-            if i == 0:
-                print(dataset)
-                i += 1
+                if not year in graph["years"]:
+                    graph["years"].append(year)
 
-        total_entries_bhs = {}
-        total_entries_decile = {}
-        bhs_results = {}
-        decile_results = {}
-        percent_tuples = [[]]
-        for result in base_results:
-            year = result.year.year
-            bhs_results[year] = bhs_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
-            total_entries_bhs[year] = total_entries_bhs.get(year, 0) + result.total_entries
-        for year in total_entries_bhs.keys():
-            proportion = bhs_results[year] / total_entries_bhs[year]
-            computed_values = np.round(proportion * 100)
-            percent_tuples[0].append((year, (list(computed_values))))
-        if comparative == "Compare by Decile":
-            percent_tuples.append([])
-            for result in comp_results:
-                year = result.year.year
-                decile_results[year] = decile_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
-                total_entries_decile[year] = total_entries_decile.get(year, 0) + result.total_entries
-            for year in total_entries_decile.keys():
-                computed_values = np.round(decile_results[year] / total_entries_decile[year] * 100)
-                percent_tuples[1].append((year, (list(computed_values))))
-        for tuple_list in percent_tuples:
-            tuple_list.sort()
-        total_entries = [(year, entries) for year, entries in total_entries_bhs.items()]
-        return render_graph(percent_tuples, subject, title, total_entries)
+        graph["years"].sort()
+        num_years = len(graph["years"])
+        graph["data_set_labels"] = list(result_dict.keys())
+        number_sets = len(result_dict.values())
+        graph["results"] = [[[0 for _ in range(num_years)] for _ in range(4)] for _ in range(number_sets)]
+        for i, dataset in enumerate(result_dict.values()):
+            for year, grades in dataset.items():
+                year_index = graph["years"].index(year)
+                for j, grade in enumerate(grades[:-1]):
+                    graph["results"][i][j][year_index] = grade
+
+        # total_entries_bhs = {}
+        # total_entries_decile = {}
+        # bhs_results = {}
+        # decile_results = {}
+        # percent_tuples = [[]]
+        # for result in base_results:
+        #     year = result.year.year
+        #     bhs_results[year] = bhs_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
+        #     total_entries_bhs[year] = total_entries_bhs.get(year, 0) + result.total_entries
+        # for year in total_entries_bhs.keys():
+        #     proportion = bhs_results[year] / total_entries_bhs[year]
+        #     computed_values = np.round(proportion * 100)
+        #     percent_tuples[0].append((year, (list(computed_values))))
+        # if comparative == "Compare by Decile":
+        #     percent_tuples.append([])
+        #     for result in comp_results:
+        #         year = result.year.year
+        #         decile_results[year] = decile_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
+        #         total_entries_decile[year] = total_entries_decile.get(year, 0) + result.total_entries
+        #     for year in total_entries_decile.keys():
+        #         computed_values = np.round(decile_results[year] / total_entries_decile[year] * 100)
+        #         percent_tuples[1].append((year, (list(computed_values))))
+        # for tuple_list in percent_tuples:
+        #     tuple_list.sort()
+        #total_entries = [(year, entries) for year, entries in total_entries_bhs.items()]
+        return render_graph(graph, subject, title, [0,0,0,0,0], number_sets)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")
 
