@@ -236,7 +236,7 @@ h1, h2 {
 
 .chart-container {
     width: max(400px, 38vw);
-    height: max(300px, 30vw);
+    height: max(400px, 30vw);
 }
 
 .simple-list {

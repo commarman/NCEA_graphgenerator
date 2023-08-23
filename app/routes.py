@@ -150,7 +150,7 @@ def retrieve_graph_data():
             if comparative == "Compare by Ethnicity":
                 key = result.ethnicity.name
             elif comparative == "Compare by Level":
-                key = result.level
+                key = f"Level {result.level}"
             elif comparative == "Compare by Decile":
                 key = result.group.name
             else:
@@ -160,7 +160,7 @@ def retrieve_graph_data():
             result_dict[key] = current
         
         # Convert numbers to proportions.
-        graph = {"years":[]}
+        graph = {"years":[], "title":title}
         for key, dataset in result_dict.items():
             for year, grades in dataset.items():
                 proportion = grades / grades[4]  # Divide by total entries.
@@ -180,31 +180,6 @@ def retrieve_graph_data():
                 for j, grade in enumerate(grades[:-1]):
                     graph["results"][i][j][year_index] = grade
 
-        # total_entries_bhs = {}
-        # total_entries_decile = {}
-        # bhs_results = {}
-        # decile_results = {}
-        # percent_tuples = [[]]
-        # for result in base_results:
-        #     year = result.year.year
-        #     bhs_results[year] = bhs_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
-        #     total_entries_bhs[year] = total_entries_bhs.get(year, 0) + result.total_entries
-        # for year in total_entries_bhs.keys():
-        #     proportion = bhs_results[year] / total_entries_bhs[year]
-        #     computed_values = np.round(proportion * 100)
-        #     percent_tuples[0].append((year, (list(computed_values))))
-        # if comparative == "Compare by Decile":
-        #     percent_tuples.append([])
-        #     for result in comp_results:
-        #         year = result.year.year
-        #         decile_results[year] = decile_results.get(year, np.zeros(4)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence])
-        #         total_entries_decile[year] = total_entries_decile.get(year, 0) + result.total_entries
-        #     for year in total_entries_decile.keys():
-        #         computed_values = np.round(decile_results[year] / total_entries_decile[year] * 100)
-        #         percent_tuples[1].append((year, (list(computed_values))))
-        # for tuple_list in percent_tuples:
-        #     tuple_list.sort()
-        #total_entries = [(year, entries) for year, entries in total_entries_bhs.items()]
         return render_graph(graph, subject, title, [0,0,0,0,0], number_sets)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")
