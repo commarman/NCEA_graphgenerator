@@ -142,10 +142,10 @@
         // Generates a set of varied colours.
         colours = []
         shift = extent/number;
-        for (let i = 0; i < number; i++) {
+        for (let i = 0; i < baseColours.length; i++) {
             newColours = [];
-            for (let j = 0; j < baseColours.length; j++) {
-                colour = [baseColours[j][0] * (1-(i * shift)), baseColours[j][1] * (1-(i * shift)), baseColours[j][2] * (1-(i * shift))];
+            for (let j = 0; j < number; j++) {
+                colour = [baseColours[i][0] * (1-(j * shift)), baseColours[i][1] * (1-(j * shift)), baseColours[i][2] * (1-(j * shift))];
                 newColours.push(`rgb(${colour[0]}, ${colour[1]}, ${colour[2]})`);
             }
             colours.push(newColours);
@@ -154,33 +154,47 @@
     }
 
     graph = JSON.parse({{info | tojson}});
-    console.log(graph);
+    numDatasets = graph["results"].length;
+    COLOURS = [["rgb(245,72,66)","rgb(66,123,245)","rgb(245,197,66)"], 
+               ["rgb(255, 30, 30)","rgb(30, 60, 250)","rgb(250, 125, 0)"],
+               ["rgb(245,136,129)","rgb(94,85,177)","rgb(224,233,143)"],
+               ["rgb(255,0,0)","rgb(47,38,245)","rgb(255,255,0)"],
+               ["rgb(232,128,142)","rgb(140,160,191)","rgb(189,157,117)"],
+               ["rgb(255,144,255)","rgb(127,255,255)","rgb(237,214,160)"]];
+    if (numDatasets <= 6) {
+        colours = COLOURS.slice(0,numDatasets);
+    } else {
+        baseColours = [[255,0,0], [0,0,255], [0,255,0], [99,230,114],[200,51,232], [255, 165, 0]];
+        colours = generateColours(baseColours, 3, 0.5);
+        console.log(colours);
+    }
+    console.log(colours);
     datasets = [];
-    baseColours = [[110,110,110], [245, 72, 66], [66, 123, 245], [245,197,66]];
-    colours = generateColours(baseColours, graph["results"].length, 0.5);
-    for (let i = 0; i < graph["results"].length; i++) {
+
+    //colours = generateColours(baseColours, graph["results"].length, 0.5);
+    for (let i = 0; i < numDatasets; i++) {
         datasets.push({
             label: `${graph["data_set_labels"][i]} Excellence`,
             data: graph["results"][i][3],
-            backgroundColor: colours[i][3],
+            backgroundColor: colours[i][2],
             stack: graph["data_set_labels"][i]
         })
         datasets.push({
             label: `${graph["data_set_labels"][i]} Merit`,
-            data: graph["results"][i][2],
-            backgroundColor: colours[i][2],
+            data: graph["results"][i][3],
+            backgroundColor: colours[i][1],
             stack: graph["data_set_labels"][i]
         })
         datasets.push({
             label: `${graph["data_set_labels"][i]} Achieved`,
             data: graph["results"][i][1],
-            backgroundColor: colours[i][1],
+            backgroundColor: colours[i][0],
             stack: graph["data_set_labels"][i]
         })
         datasets.push({
             label: `${graph["data_set_labels"][i]} Not Achieved`,
             data: graph["results"][i][0],
-            backgroundColor: colours[i][0],
+            backgroundColor: `rgba(110,110,110,0.5)`,
             stack: graph["data_set_labels"][i]
         })
     }
