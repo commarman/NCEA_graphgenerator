@@ -153,6 +153,22 @@
         return colours;
     }
 
+    function generateSetColours(baseColours, shiftColours) {
+        colours = [];
+        for (let i = 0; i < baseColours.length; i++) {
+            newColours = [];
+            for (let j = 0; j < shiftColours.length; j++) {
+                colourResult = [];
+                for (let k = 0; k < 3; k++) {
+                    colourResult.push(Math.min(baseColours[i][k] + shiftColours[j][k]));
+                }
+                newColours.push(`rgb(${Math.min(colourResult[0], 255)}, ${Math.min(colourResult[1], 255)}, ${Math.min(colourResult[2],255)})`);
+            }
+            colours.push(newColours);
+        }
+        return colours;
+    }
+
     graph = JSON.parse({{info | tojson}});
     numDatasets = graph["results"].length;
     COLOURS = [["rgb(245,72,66)","rgb(66,123,245)","rgb(245,197,66)"], 
@@ -164,8 +180,9 @@
     if (numDatasets <= 6) {
         colours = COLOURS.slice(0,numDatasets);
     } else {
-        baseColours = [[255,0,0], [0,0,255], [0,255,0], [99,230,114],[200,51,232], [255, 165, 0]];
-        colours = generateColours(baseColours, 3, 0.5);
+        baseColours = [[200,72,66], [66,123,200], [200,150,66], [140,130,20],[20,150,140], [120,20,130]];
+        shiftColours = [[50,0,0], [0,0,50], [45,45,0]];
+        colours = generateSetColours(baseColours, shiftColours);
         console.log(colours);
     }
     console.log(colours);
@@ -181,7 +198,7 @@
         })
         datasets.push({
             label: `${graph["data_set_labels"][i]} Merit`,
-            data: graph["results"][i][3],
+            data: graph["results"][i][2],
             backgroundColor: colours[i][1],
             stack: graph["data_set_labels"][i]
         })
