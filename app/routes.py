@@ -4,8 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from app.forms import UploadForm, create_filter_form
 import os
 import app.data_uploader as upload
+from app.utilities import generate_title
 import numpy as np
-import re
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy()
@@ -80,106 +80,93 @@ def read_data():
         return redirect("/submit-nzqa")
 
 
-def render_graph(graph, subject, title, additional_information, set_count):
+def render_graph(graph, additional_information):
     """Render the graph display page with a graph."""
     filter_form = construct_filter_form()
     graph_data = json.dumps(graph)
-    print(additional_information["entry_totals"])
     return render_template("compare-new.html", form=filter_form, page="graph", graph=True, info=graph_data, additional=additional_information)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])
 def retrieve_graph_data():
-    """Retrieve data by filters for graphing."""
+    """Retrieve data for a specified set of filters."""
 
     form = construct_filter_form()
-    if form.validate_on_submit():
-        # Get values from form.
-        subject = form.subject.data
-        assess_type = form.assess_type.data
-        level = form.level.data
-        ethnicity = form.ethnicity.data
-        comparative = form.compare.data
+    if not form.validate_on_submit():
+        flash("Error: Filter Form invalid.")
+        return redirect("/nzqa-data")
 
-        # Get a set of results to apply filters to.
-        if comparative == "Compare by Decile":
-            base_results = models.Result.query
-        else:
-            base_results = models.Result.query.filter_by(grouping_id=1)
-        # Get comparative results.
+    subject = form.subject.data
+    assess_type = form.assess_type.data
+    level = form.level.data
+    ethnicity = form.ethnicity.data
+    comparative = form.compare.data
 
-        if comparative == "Compare by Decile":
-            #base_results.group_by(models.Result.grouping_id)
-            title = f"Burnside against Decile 8-10 {level} {subject} {assess_type} results for {ethnicity} students"
-        elif comparative == "Compare by Ethnicity":
-            base_results.group_by(models.Result.ethnicity_id)
-            title = f"Burnside {level} {subject} {assess_type} results across Ethnicity"
+    # Get a set of results to apply filters to.
+    if comparative == "Compare by Decile":
+        base_results = models.Result.query
+    else:
+        base_results = models.Result.query.filter_by(grouping_id=1)
+
+    # Apply each filter.
+    if subject != "No filter":
+        subject_id = models.Subject.query.filter_by(name=subject).first_or_404().id
+        base_results = base_results.filter_by(subject_id=subject_id)
+    if assess_type != "No filter":
+        assess_code = 1 if assess_type == "External" else 0
+        base_results = base_results.filter_by(external=assess_code)
+    if ethnicity != "No filter":
+        ethnicity_id = models.Ethnicity.query.filter_by(name=ethnicity).first_or_404().id
+        base_results = base_results.filter_by(ethnicity_id=ethnicity_id)
+    if level != "No filter":
+        base_results = base_results.filter_by(level=int(level.split(" ")[1]))  # Level is received in format 'Level X'
+
+    # Once filters are applied, get all results to be processed.
+    base_results = base_results.all()
+    # graph is the final dictionary used to produce a graph.
+    graph = {"years":[], "title": generate_title(comparative, level, subject, assess_type, ethnicity)}
+    # Create a dictionary to store results for each dataset being compared.
+    result_dict = {}
+    for result in base_results:
+        year = result.year.year
+        if comparative == "Compare by Ethnicity":
+            key = result.ethnicity.name
         elif comparative == "Compare by Level":
-            #base_results.group_by(models.Result.level)
-            title = f"Burnside {subject} {assess_type} results across Level for {ethnicity} students"
+            key = f"Level {result.level}"
+        elif comparative == "Compare by Decile":
+            key = result.group.name
         else:
-            title = f"Burnside {level} {subject} {assess_type} results for {ethnicity} students"
-        title = re.sub("No filter ", "", title)  # Use regex to remove 'No filter' appearances.
-        if subject != "No filter":
-            subject_id = models.Subject.query.filter_by(name=subject).first_or_404().id
-            base_results = base_results.filter_by(subject_id=subject_id)
-        if assess_type != "No filter":
-            assess_code = 1 if assess_type == "External" else 0
-            base_results = base_results.filter_by(external=assess_code)
-        if ethnicity != "No filter":
-            ethnicity_id = models.Ethnicity.query.filter_by(name=ethnicity).first_or_404().id
-            base_results = base_results.filter_by(ethnicity_id=ethnicity_id)
-        if level != "No filter":
-            base_results = base_results.filter_by(level=int(level.split(" ")[1]))  # Level is received in format 'Level X'
-
-
-        base_results = base_results.all()
-        # Convert results to graphable information.
-        result_dict = {}
-        graph = {"years":[], "title":title}
-        # Result dicts is a dict of each dataset being compared with by year and grade.
-        for result in base_results:
-            year = result.year.year
-            if comparative == "Compare by Ethnicity":
-                key = result.ethnicity.name
-            elif comparative == "Compare by Level":
-                key = f"Level {result.level}"
-            elif comparative == "Compare by Decile":
-                key = result.group.name
-            else:
-                key = "Burnside"
-            current = result_dict.get(key, {})
-            current[year] = current.get(year, np.zeros(5)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence, result.total_entries])
-            result_dict[key] = current
-            if not year in graph["years"]:
-                graph["years"].append(year)
-        
-        graph["years"].sort()
-        # Convert numbers to proportions.
-        num_years = len(graph["years"])
-        additional_information = {"entry_totals":[[year, 0] for year in graph["years"]]}
-        for key, dataset in result_dict.items():
-            for year, grades in dataset.items():
-                proportion = grades / grades[4]  # Divide by total entries.
-                computed_values = np.round(proportion * 100)
-                dataset[year] = computed_values
-                if not key in ["Decile 8-10", "National"]:
-                    index = graph["years"].index(year)
-                    additional_information["entry_totals"][index][1] += int(grades[4])
-                
-
-        graph["data_set_labels"] = list(result_dict.keys())
-        number_sets = len(result_dict.values())
-        graph["results"] = [[[0 for _ in range(num_years)] for _ in range(4)] for _ in range(number_sets)]
-        for i, dataset in enumerate(result_dict.values()):
-            for year, grades in dataset.items():
-                year_index = graph["years"].index(year)
-                for j, grade in enumerate(grades[:-1]):
-                    graph["results"][i][j][year_index] = grade
-
-        return render_graph(graph, subject, title, additional_information, number_sets)
-    flash("It didn't work as expected/")
-    return redirect("/nzqa-data")
+            key = "Burnside"
+        # Get the current results for the key, or create an empty dict.
+        current = result_dict.get(key, {})
+        # Use numpy vectorisation to quickly add arrays of grades.
+        current[year] = current.get(year, np.zeros(5)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence, result.total_entries])
+        result_dict[key] = current  # Newly created dictionaries need to be added, otherwise this line has no effect.
+        if year not in graph["years"]:
+            graph["years"].append(year)
+    
+    graph["years"].sort()
+    additional_information = {"entry_totals":[[year, 0] for year in graph["years"]]}
+    graph["data_set_labels"] = list(result_dict.keys())
+    num_years = len(graph["years"])
+    number_sets = len(result_dict.values())
+    graph["results"] = [[[0 for _ in range(num_years)] for _ in range(4)] for _ in range(number_sets)]
+    i = 0
+    for key, dataset in result_dict.items():
+        for year, grades in dataset.items():
+            # Convert numbers to proportions.
+            proportion = grades / grades[4] 
+            computed_values = np.round(proportion * 100)
+            # Restructure data to be seperated by grade.
+            year_index = graph["years"].index(year)
+            for j, grade in enumerate(computed_values[:-1]):
+                graph["results"][i][j][year_index] = grade
+            # Get the total number of Burnside High School entries for each year in the data.
+            if not key in ["Decile 8-10", "National"]:
+                index = graph["years"].index(year)
+                additional_information["entry_totals"][index][1] += int(grades[4])
+        i += 1
+    return render_graph(graph, additional_information)
 
 
 if __name__ == "__main__":

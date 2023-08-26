@@ -1,5 +1,7 @@
 """Functions for uploading data to the database."""
 import numpy as np
+
+# Constants.
 EXT_ASSESS = "Externally Assessed"
 BHS_NAME = "Burnside High School"
 NATIONAL_NAME = "Decile 8-10"
@@ -9,7 +11,7 @@ def read_csv(csv_file):
     """Read the csv file."""
     lines = csv_file.readlines()
     lines = [line.decode("utf-8").split(",") for line in lines]
-    return lines[4:] # First four lines are headers.
+    return lines[4:]  # First four lines are headers.
 
 
 def add_categories(csv_file, db, models):
@@ -44,8 +46,9 @@ def add_results(csv_file, db, models):
        Assumes all subjects, ethnicities, and years
        already exist in the corresponding table."""
 
+    # Numpy used to speed up processing.
     csv_file = np.array(csv_file)
-    used_lines = csv_file[(csv_file[:, 5] != '0')]
+    used_lines = csv_file[(csv_file[:, 5] != '0')]  # Get all lines with an entry from Burnside.
     for line in used_lines:
         subject, level, ethnicity, assess_type, year = line[:5]
         bhs_results = line[5:18]

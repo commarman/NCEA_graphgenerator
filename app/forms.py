@@ -4,13 +4,17 @@ from wtforms import SubmitField, SelectField
 
 
 class UploadForm(FlaskForm):
+    """Form for uploading NZQA data."""
 
     nzqa = FileField(validators=[FileRequired(), FileAllowed(["csv"])])
     submit = SubmitField("Upload")
 
 
 def create_filter_form(subjects, ethnicities):
+    """Create a FilterForm class based on provided subjects and ethnicites."""
+
     class FilterForm(FlaskForm):
+        """Form for selecting filters to return graphs."""
         subject = SelectField("Subject", choices=["No filter"] + subjects, validators=[DataRequired()])
         assess_type = SelectField("Assessment Type", choices=["No filter","Internal", "External"])
         ethnicity = SelectField("Ethnicity", choices=["No filter"] + ethnicities)
