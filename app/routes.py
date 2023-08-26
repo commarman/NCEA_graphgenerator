@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, g, request, redirect, url_for, session, json, flash
+from flask import render_template, redirect, url_for, json, flash
 from flask_sqlalchemy import SQLAlchemy
 from app.forms import UploadForm, create_filter_form
 import os
@@ -15,6 +15,19 @@ import app.models as models
 app.config.from_pyfile('config.py')
 
 
+def construct_filter_form():
+    """Retrieves subject and ethnicity data and returns a filter form."""
+    # Subjects.
+    subjects = models.Subject.query.all()
+    subject_names = [subject.name for subject in subjects]
+    subject_names.sort()
+    # Ethnicities.
+    ethnicities = models.Ethnicity.query.all()
+    ethnicity_list = [ethnicity.name for ethnicity in ethnicities]
+    ethnicity_list.sort()
+    return create_filter_form(subject_names, ethnicity_list)
+
+# Routes.
 @app.errorhandler(404)
 def page_not_found(e):
     """Render the 404 page."""
@@ -26,74 +39,53 @@ def home():
     """Render the home page."""
     return render_template("home.html", page="home")
 
-def construct_filter_form():
-    """Construct a filter form."""
-    # Subjects.
-    subjects = models.Subject.query.all()
-    subject_names = [subject.name for subject in subjects]
-    subject_names.sort()
-    # Ethnicities.
-    ethnicities = models.Ethnicity.query.all()
-    ethnicity_list = [ethnicity.name for ethnicity in ethnicities]
-    ethnicity_list.sort()
-    return create_filter_form(subject_names, ethnicity_list)
-
 
 @app.route("/nzqa-data")
 def nzqa_data():
-    """Render the comparison graph generator page."""
+    """Render the graph display page with no graph."""
+
     if len(models.Result.query.all()) == 0:
         flash("There is currently no data. Upload data first.")
         return redirect("/submit-nzqa")
-    form = construct_filter_form()
-    return render_template("compare-new.html", form=form, page="graph", graph=False)
+
+    filter_form = construct_filter_form()
+    return render_template("compare-new.html", form=filter_form, page="graph", graph=False)
 
 
 @app.route("/submit-nzqa", methods=["GET","POST"])
 def submit_data():
-    """Submit NCEA data for upload."""
+    """Render the data submission page."""
 
-    form = UploadForm()
-
-    return render_template("upload.html", form=form, page="upload")
+    upload_form = UploadForm()
+    return render_template("upload.html", form=upload_form, page="upload")
 
 
 @app.route("/read-data", methods=["POST"])
 def read_data():
     """Read form data."""
-    form = UploadForm()
-    if form.validate_on_submit():
-        file = form.nzqa.data
+
+    upload_form = UploadForm()
+    if upload_form.validate_on_submit():
+        file = upload_form.nzqa.data
+        # Data is entered using 'data_uploader.py'.
         lines = upload.read_csv(file)
+        # Add any new categories that appear in the data.
         upload.add_categories(lines, db, models)
+        # Add the results.
         upload.add_results(lines, db, models)
         flash("Data succesfully Uploaded!")
         return redirect("/nzqa-data")
     else:
-        flash("Error: File didn't validate.")
+        flash("Error: Must be a .csv file.")
         return redirect("/submit-nzqa")
 
 
-def render_graph(graph, subject, title, entry_totals, set_count):
-    """Render the html page with a graph."""
-    form = construct_filter_form()
-    #years = [result[0] for result in result_years[0]]
-    #bhs_values = [result[1] for result in result_years[0]]
-    #not_achieved = [value[0] for value in bhs_values]
-    #achieved = [value[1] for value in bhs_values]
-    #merit = [value[2] for value in bhs_values]
-    #excellence = [value[3] for value in bhs_values]
-    #graph_dict = {"labels": years, "title":title}
-    #for i, result_set in enumerate(result_years):
-        #grades = [result[1] for result in result_set]
-        #graph_dict[f"not_achieved{i+1}"] = result_set[0]
-        #graph_dict[f"achieved{i+1}"] = result_set[1]
-        #graph_dict[f"merit{i+1}"] = result_set[2]
-        #graph_dict[f"excellence{i+1}"] = result_set[3]
-    additional_dict = {"entries": entry_totals}
-    print(graph)
+def render_graph(graph, subject, title, additional_information, set_count):
+    """Render the graph display page with a graph."""
+    filter_form = construct_filter_form()
     graph_data = json.dumps(graph)
-    return render_template("compare-new.html", form=form, page="graph", info=graph_data, graph=True, additional=additional_dict, number_sets=set_count)
+    print(additional_information["entry_totals"])
+    return render_template("compare-new.html", form=filter_form, page="graph", graph=True, info=graph_data, additional=additional_information)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])
@@ -144,6 +136,7 @@ def retrieve_graph_data():
         base_results = base_results.all()
         # Convert results to graphable information.
         result_dict = {}
+        graph = {"years":[], "title":title}
         # Result dicts is a dict of each dataset being compared with by year and grade.
         for result in base_results:
             year = result.year.year
@@ -158,19 +151,23 @@ def retrieve_graph_data():
             current = result_dict.get(key, {})
             current[year] = current.get(year, np.zeros(5)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence, result.total_entries])
             result_dict[key] = current
+            if not year in graph["years"]:
+                graph["years"].append(year)
         
+        graph["years"].sort()
         # Convert numbers to proportions.
-        graph = {"years":[], "title":title}
+        num_years = len(graph["years"])
+        additional_information = {"entry_totals":[[year, 0] for year in graph["years"]]}
         for key, dataset in result_dict.items():
             for year, grades in dataset.items():
                 proportion = grades / grades[4]  # Divide by total entries.
                 computed_values = np.round(proportion * 100)
                 dataset[year] = computed_values
-                if not year in graph["years"]:
-                    graph["years"].append(year)
+                if not key in ["Decile 8-10", "National"]:
+                    index = graph["years"].index(year)
+                    additional_information["entry_totals"][index][1] += int(grades[4])
+                
 
-        graph["years"].sort()
-        num_years = len(graph["years"])
         graph["data_set_labels"] = list(result_dict.keys())
         number_sets = len(result_dict.values())
         graph["results"] = [[[0 for _ in range(num_years)] for _ in range(4)] for _ in range(number_sets)]
@@ -180,7 +177,7 @@ def retrieve_graph_data():
                 for j, grade in enumerate(grades[:-1]):
                     graph["results"][i][j][year_index] = grade
 
-        return render_graph(graph, subject, title, [0,0,0,0,0], number_sets)
+        return render_graph(graph, subject, title, additional_information, number_sets)
     flash("It didn't work as expected/")
     return redirect("/nzqa-data")
 

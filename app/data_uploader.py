@@ -2,7 +2,7 @@
 import numpy as np
 EXT_ASSESS = "Externally Assessed"
 BHS_NAME = "Burnside High School"
-NATIONAL_NAME = "National"
+NATIONAL_NAME = "Decile 8-10"
 
 
 def read_csv(csv_file):
