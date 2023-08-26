@@ -149,8 +149,8 @@ h1, h2 {
 
 #additional-info {
     overflow-y: hidden;
-    height:400px;
     transition: 0.25s;
+    height: 300px;
 }
 
 .centre-form {
@@ -296,15 +296,23 @@ h1, h2 {
     transition: 0.25s;
 }
 
+.main-default {
+    margin-left: 50px;
+}
+
+.main-pushed-margin {
+    margin-left : calc(min(400px, 90vw) + 50px);
+}
+
 .main-box {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 #main {
     transition: 0.3s;
-    margin-left: 50px;
 }
 
 .open-button {
@@ -337,4 +345,27 @@ footer {
     color: white;
     font-size: small;
     text-align: center;
+}
+
+#mobile-form {
+    display: none;
+}
+
+@media screen and (max-width: 1300px) {
+    .side-menu {
+        display:none;
+    }
+    .side-bar {
+        display: none;
+    }
+
+    .main-pushed-margin, .main-default {
+        margin-left: 0px;
+    }
+
+    #mobile-form {
+        display: block;
+        align-self: center;
+        margin-bottom: 10px;
+    }
 }

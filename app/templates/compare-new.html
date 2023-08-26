@@ -27,7 +27,7 @@
             </a>
         </a>
     </div>
-<div id="main">
+<div id="main" class="main-default">
     <div class="title-area">
         <h1>Graph Display</h1>
     </div>
@@ -57,11 +57,13 @@
             </div>
             {% endif %}
         </div>
+        {% if graph %}
         <div>
             <div class="chart-container">
                 <canvas id="NCEAgraph"></canvas>
             </div>
         </div>
+        {% endif %}
     </div>
     </div>
     <script>
@@ -95,18 +97,38 @@
                 document.getElementById("sideMenu").style.width = "0px";
                 document.getElementById("sideOpen").style.left = "0px";
                 document.getElementById("arrowImage").src = "/static/icons/right-arrow.png";
-                document.getElementById("main").style.marginLeft = "50px"
+                document.getElementById("main").classList.remove("main-pushed-margin");
             } else {
                 document.getElementById("sideMenu").style.width = "min(400px, 90vw)";
                 document.getElementById("sideOpen").style.left = "min(400px, 90vw)";
                 document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
-                document.getElementById("main").style.marginLeft = "calc(min(400px, 90vw) + 50px)";
+                document.getElementById("main").classList.add("main-pushed-margin");
             }
             menuOpen = !menuOpen;
         }
         toggleMenu();
     </script>
 </div>
+</div>
+<div id="mobile-form">
+    <h1>Generate</h1>
+        <form action="/retrieve-graph-data" method="post" class="filter-form">
+            <div class="form-content">
+                <label for="Subject" class="filter-label">Subject</label>
+                {{form.subject(class="filter-field")}}
+                <label for="NCEA Level" class="filter-label">Level</label>
+                {{form.level(class="filter-field", id="level-field")}}
+                <label for="Assessment Type" class="filter-label">Assessment Type</label>
+                {{form.assess_type(class="filter-field")}}
+                <label for="Ethnicity" class="filter-label">Ethnicity</label>
+                {{form.ethnicity(class="filter-field", id="ethnicity-field")}}
+                <label for="Comparison" class="filter-label">Comparison Type</label>
+                {{form.compare(class="filter-field", id="compare-field", onchange="changeForm()")}}
+                <input type="hidden" name="none" value="No filter" id="default-value">
+                {{form.submit(class="form-button")}}
+                {{form.csrf_token}}
+            </div>
+        </form>
 </div>
 {% with messages = get_flashed_messages() %}
 {% if messages|length > 0 %}
@@ -127,7 +149,7 @@
     function showInfo() {
         infoButton.style.display = "none";
         hideButton.style.display = "block";
-        infoList.style.height = "500px";
+        infoList.style.height = "300px";
         //infoList.style.visibility = "visible";
     }
     function hideInfo() {
@@ -182,9 +204,7 @@
         baseColours = [[200,72,66], [66,123,200], [200,150,66], [140,130,20],[20,150,140], [120,20,130]];
         shiftColours = [[50,0,0], [0,0,50], [45,45,0]];
         colours = generateSetColours(baseColours, shiftColours);
-        console.log(colours);
     }
-    console.log(colours);
     datasets = [];
 
     //colours = generateColours(baseColours, graph["results"].length, 0.5);
@@ -218,7 +238,6 @@
         labels: graph["years"],
         datasets : datasets
     }
-    console.log(chartData); 
     new Chart("NCEAgraph", {
         type: "bar",
         data : chartData,
