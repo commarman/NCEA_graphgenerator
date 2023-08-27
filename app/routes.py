@@ -1,7 +1,8 @@
 from app import app
 from flask import render_template, redirect, url_for, json, flash
 from flask_sqlalchemy import SQLAlchemy
-from app.forms import UploadForm, create_filter_form
+from app.forms import UploadForm, create_filter_form, DeleteForm
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import app.data_uploader as upload
 from app.utilities import generate_title
@@ -13,6 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(basedir, "re
 db.init_app(app)
 import app.models as models
 app.config.from_pyfile('config.py')
+HASHED_DATABASE_PASSWORD = "pbkdf2:sha256:260000$Hf0NEOHyI5TLiHdD$16df7450344156ac3744527e4fefddc5b9bc9d79610dbbfb8b1007abbe1d1f3a"
 
 
 def construct_filter_form():
@@ -67,18 +69,52 @@ def read_data():
     upload_form = UploadForm()
     if upload_form.validate_on_submit():
         file = upload_form.nzqa.data
+        password = upload_form.password.data
+        if not check_password_hash(HASHED_DATABASE_PASSWORD, password):
+            flash("Incorrect Password")
+            return redirect("/submit-nzqa")
         # Data is entered using 'data_uploader.py'.
-        lines = upload.read_csv(file)
-        # Add any new categories that appear in the data.
-        upload.add_categories(lines, db, models)
-        # Add the results.
-        upload.add_results(lines, db, models)
-        flash("Data succesfully Uploaded!")
-        return redirect("/nzqa-data")
+        try:
+            lines = upload.read_csv(file)
+            # Add any new categories that appear in the data.
+            upload.add_categories(lines, db, models)
+            # Add the results.
+            upload.add_results(lines, db, models)
+        except:
+            flash("Error: File is not formatted correctly.")
+            return redirect("/submit-nzqa")
+        else:
+            flash("Data succesfully Uploaded!")
+            return redirect("/nzqa-data")
     else:
         flash("Error: Must be a .csv file.")
         return redirect("/submit-nzqa")
 
+
+
+@app.route("/clear-data", methods=["GET"])
+def clear_data():
+    """Render the data clearing page."""
+    delete_form = DeleteForm()
+    return render_template("clear-data.html", form=delete_form, page="data_clear")
+
+
+@app.route("/delete-data", methods=["POST"])
+def delete_data():
+    """Clear the database if the form is correct."""
+    delete_form = DeleteForm()
+    if delete_form.validate_on_submit():
+        password = delete_form.password.data
+        if not check_password_hash(HASHED_DATABASE_PASSWORD, password):
+            flash("Incorrect Password")
+            return redirect("/clear-data")
+
+        upload.clear_results(db, models)
+        flash("Database succesfully cleared.")
+        return redirect("/submit-nzqa")
+    else:
+        flash("An unexpected error occured.")
+        return redirect("/clear-data")
 
 def render_graph(graph, additional_information):
     """Render the graph display page with a graph."""

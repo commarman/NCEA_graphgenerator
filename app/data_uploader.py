@@ -85,3 +85,12 @@ def add_results(csv_file, db, models):
         db.session.add(comp_result)
     db.session.commit()
 
+
+def clear_results(db, models):
+    """Clear the results table."""
+
+    models.Result.query.delete()
+    models.Subject.query.delete()
+    models.Ethnicity.query.delete()
+    models.AcademicYear.query.delete()
+    db.session.commit()

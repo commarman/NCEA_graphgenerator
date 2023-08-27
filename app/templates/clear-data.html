@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="info-box">
+    <h1>Clear Data</h1>
+    <p class="info-text">Erase all data, so it can be re-uploaded.</p>
+<div class="centre-form">
+    <form action="/delete-data" method="post" class="centre-form">
+        <div>
+            <label for="Password">Enter Password: </label>
+            {{form.password(class="password-field")}}
+        </div>
+        <label for="submit-button" class="form-button" id="submit-label">Clear Data</label>
+        {{form.submit(class="hidden", id="submit-button")}}
+        {{form.csrf_token}}
+    </form>
+</div>
+</div>
+{% with messages = get_flashed_messages() %}
+    {% if messages|length > 0 %}
+        <dialog open class="flash-dialog">
+            {% for message in messages %}
+                <p>{{message}}</p>
+            {% endfor %}
+            <button onclick="this.parentElement.close()">Close</button>
+        </dialog>
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

@@ -1,13 +1,19 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed, DataRequired
-from wtforms import SubmitField, SelectField
+from wtforms import SubmitField, SelectField, PasswordField
 
 
 class UploadForm(FlaskForm):
     """Form for uploading NZQA data."""
 
     nzqa = FileField(validators=[FileRequired(), FileAllowed(["csv"])])
+    password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Upload")
+
+
+class DeleteForm(FlaskForm):
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Clear Database")
 
 
 def create_filter_form(subjects, ethnicities):
