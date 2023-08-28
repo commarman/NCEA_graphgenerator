@@ -1,5 +1,7 @@
+"""Routes for the graph generator."""
+
 from app import app
-from flask import render_template, redirect, url_for, json, flash
+from flask import render_template, redirect, json, flash
 from flask_sqlalchemy import SQLAlchemy
 from app.forms import UploadForm, create_filter_form, DeleteForm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -18,7 +20,7 @@ HASHED_DATABASE_PASSWORD = "pbkdf2:sha256:260000$Hf0NEOHyI5TLiHdD$16df7450344156
 
 
 def construct_filter_form():
-    """Retrieves subject and ethnicity data and returns a filter form."""
+    """Retrieve subject and ethnicity data and returns a filter form."""
     # Subjects.
     subjects = models.Subject.query.all()
     subject_names = [subject.name for subject in subjects]
@@ -28,6 +30,7 @@ def construct_filter_form():
     ethnicity_list = [ethnicity.name for ethnicity in ethnicities]
     ethnicity_list.sort()
     return create_filter_form(subject_names, ethnicity_list)
+
 
 # Routes.
 @app.errorhandler(405)
@@ -51,7 +54,6 @@ def home():
 @app.route("/nzqa-data")
 def nzqa_data():
     """Render the graph display page with no graph."""
-
     if len(models.Result.query.all()) == 0:
         flash("There is currently no data. Upload data first.")
         return redirect("/submit-nzqa")
@@ -60,10 +62,9 @@ def nzqa_data():
     return render_template("compare-new.html", form=filter_form, page="graph", graph=False)
 
 
-@app.route("/submit-nzqa", methods=["GET","POST"])
+@app.route("/submit-nzqa", methods=["GET", "POST"])
 def submit_data():
     """Render the data submission page."""
-
     upload_form = UploadForm()
     return render_template("upload.html", form=upload_form, page="upload")
 
@@ -71,7 +72,6 @@ def submit_data():
 @app.route("/read-data", methods=["POST"])
 def read_data():
     """Read form data."""
-
     upload_form = UploadForm()
     if upload_form.validate_on_submit():
         file = upload_form.nzqa.data
@@ -86,7 +86,7 @@ def read_data():
             upload.add_categories(lines, db, models)
             # Add the results.
             upload.add_results(lines, db, models)
-        except:
+        except IndexError:
             flash("Error: File is not formatted correctly.")
             return redirect("/submit-nzqa")
         else:
@@ -95,7 +95,6 @@ def read_data():
     else:
         flash("Error: Must be a .csv file.")
         return redirect("/submit-nzqa")
-
 
 
 @app.route("/clear-data", methods=["GET"])
@@ -122,6 +121,7 @@ def delete_data():
         flash("An unexpected error occured.")
         return redirect("/clear-data")
 
+
 def render_graph(graph, additional_information):
     """Render the graph display page with a graph."""
     filter_form = construct_filter_form()
@@ -132,7 +132,6 @@ def render_graph(graph, additional_information):
 @app.route("/retrieve-graph-data", methods=["POST"])
 def retrieve_graph_data():
     """Retrieve data for a specified set of filters."""
-
     form = construct_filter_form()
     if not form.validate_on_submit():
         flash("Error: Filter Form invalid.")
@@ -166,7 +165,7 @@ def retrieve_graph_data():
     # Once filters are applied, get all results to be processed.
     base_results = base_results.all()
     # graph is the final dictionary used to produce a graph.
-    graph = {"years":[], "title": generate_title(comparative, level, subject, assess_type, ethnicity)}
+    graph = {"years": [], "title": generate_title(comparative, level, subject, assess_type, ethnicity)}
     # Create a dictionary to store results for each dataset being compared.
     result_dict = {}
     for result in base_results:
@@ -186,9 +185,9 @@ def retrieve_graph_data():
         result_dict[key] = current  # Newly created dictionaries need to be added, otherwise this line has no effect.
         if year not in graph["years"]:
             graph["years"].append(year)
-    
+
     graph["years"].sort()
-    additional_information = {"entry_totals":[[year, 0] for year in graph["years"]]}
+    additional_information = {"entry_totals": [[year, 0] for year in graph["years"]]}
     graph["data_set_labels"] = list(result_dict.keys())
 
     if len(graph["data_set_labels"]) > 6:  # Not enough colours to display over 6.
@@ -202,14 +201,14 @@ def retrieve_graph_data():
     for key, dataset in result_dict.items():
         for year, grades in dataset.items():
             # Convert numbers to proportions.
-            proportion = grades / grades[4] 
+            proportion = grades / grades[4]
             computed_values = np.round(proportion * 100)
             # Restructure data to be seperated by grade.
             year_index = graph["years"].index(year)
             for j, grade in enumerate(computed_values[:-1]):
                 graph["results"][i][j][year_index] = grade
             # Get the total number of Burnside High School entries for each year in the data.
-            if not key in ["Decile 8-10", "National"]:
+            if key not in ["Decile 8-10", "National"]:
                 index = graph["years"].index(year)
                 additional_information["entry_totals"][index][1] += int(grades[4])
         i += 1
