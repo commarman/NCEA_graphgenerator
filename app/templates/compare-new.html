@@ -200,13 +200,7 @@
                ["rgb(144, 13, 9)","rgb(5, 16, 148)","rgb(255, 149, 5)"],
                ["rgb(188, 84, 75)","rgb(142, 249, 243)","rgb(238, 252, 94)"],
                ["rgb(227, 36, 43)","rgb(56, 57, 97)","rgb(255, 182, 39)"]];
-    if (numDatasets <= 6) {
-        colours = COLOURS.slice(0,numDatasets);
-    } else {
-        baseColours = [[200,72,66], [66,123,200], [200,150,66], [140,130,20],[20,150,140], [120,20,130]];
-        shiftColours = [[50,0,0], [0,0,50], [45,45,0]];
-        colours = generateSetColours(baseColours, shiftColours);
-    }
+    colours = COLOURS.slice(0,numDatasets);
     datasets = [];
 
     //colours = generateColours(baseColours, graph["results"].length, 0.5);

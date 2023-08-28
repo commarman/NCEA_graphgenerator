@@ -30,6 +30,12 @@ def construct_filter_form():
     return create_filter_form(subject_names, ethnicity_list)
 
 # Routes.
+@app.errorhandler(405)
+def disallowed_method(e):
+    """Render the 404 page."""
+    return render_template("404.html")
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Render the 404 page."""
@@ -184,6 +190,11 @@ def retrieve_graph_data():
     graph["years"].sort()
     additional_information = {"entry_totals":[[year, 0] for year in graph["years"]]}
     graph["data_set_labels"] = list(result_dict.keys())
+
+    if len(graph["data_set_labels"]) > 6:  # Not enough colours to display over 6.
+        flash("Error: Too many datasets.")
+        return redirect("nzqa-data")
+
     num_years = len(graph["years"])
     number_sets = len(result_dict.values())
     graph["results"] = [[[0 for _ in range(num_years)] for _ in range(4)] for _ in range(number_sets)]
