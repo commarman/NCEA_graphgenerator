@@ -47,9 +47,10 @@ def add_categories(csv_file, db, models):
 
 def add_results(csv_file, db, models):
     """Add results from a csv file.
-       Assumes all subjects, ethnicities, and years
-       already exist in the corresponding table."""
 
+    Assumes all subjects, ethnicities, and years
+    already exist in the corresponding table.
+    """
     # Numpy used to speed up processing.
     csv_file = np.array(csv_file)
     used_lines = csv_file[(csv_file[:, 5] != '0')]  # Get all lines with an entry from Burnside.
@@ -80,10 +81,10 @@ def add_results(csv_file, db, models):
         comp_e = compare_results[11]
         comp_id = models.Grouping.query.filter_by(name=NATIONAL_NAME)[0].id
 
-        bhs_result = models.Result(subject_id, year_id, ethnicity_id, bhs_id,level, external, 
+        bhs_result = models.Result(subject_id, year_id, ethnicity_id, bhs_id, level, external,
                                    bhs_entries, bhs_assessed, bhs_na, bhs_a, bhs_m, bhs_e)
 
-        comp_result = models.Result(subject_id, year_id, ethnicity_id, comp_id, level, external, 
+        comp_result = models.Result(subject_id, year_id, ethnicity_id, comp_id, level, external,
                                     comp_entries, comp_assessed, comp_na, comp_a, comp_m, comp_e)
         db.session.add(bhs_result)
         db.session.add(comp_result)
@@ -93,7 +94,6 @@ def add_results(csv_file, db, models):
 
 def clear_results(db, models):
     """Clear the results table."""
-
     models.Result.query.delete()
     models.Subject.query.delete()
     models.Ethnicity.query.delete()

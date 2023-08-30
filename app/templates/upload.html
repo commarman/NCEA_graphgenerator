@@ -38,7 +38,9 @@
     {% block javascript %}
     <script>
         function displayFilename(fileInput) {
+            /* Display the filename using the 'filename-display element. */
             var file = fileInput.value;
+            // Get just the file name, not the full path.
             var filename = file.split("\\");
             document.getElementById("filename-display").innerHTML = filename[filename.length - 1];
             document.getElementById("submit-label").style.visibility = "visible"

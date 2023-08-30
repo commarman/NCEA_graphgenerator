@@ -66,50 +66,6 @@
         {% endif %}
     </div>
     </div>
-    <script>
-        compareFields = document.getElementsByClassName("compare-field");
-        ethnicityFields = document.getElementsByClassName("ethnicity-field");
-        levelFields = document.getElementsByClassName("level-field");
-        defaultInputs = document.getElementsByClassName("default-value");
-
-        function changeForm() {
-            for (let i = 0; i < 2; i++) {
-                ethnicityFields[i].disabled = false;
-                levelFields[i].disabled = false;
-                if (compareFields[i].value == "Compare by Ethnicity") {
-                    ethnicityFields[i].disabled = true;
-                    ethnicityFields[i].value = "No filter";
-                    defaultInputs[i].name = "ethnicity";
-                } 
-                else if (compareFields[i].value == "Compare by Level") {
-                    levelFields[i].disabled = true;
-                    levelFields[i].value = "No filter";
-                    defaultInputs[i].name = "level";
-                } else {
-                    defaultInputs[i].name = "none";
-                }
-            }
-        }
-
-        changeForm(); // Update when page is first loaded.
-
-        var menuOpen = false;
-        function toggleMenu() { // Open and close the side menu.
-            if (menuOpen) {
-                document.getElementById("sideMenu").style.width = "0px";
-                document.getElementById("sideOpen").style.left = "0px";
-                document.getElementById("arrowImage").src = "/static/icons/right-arrow.png";
-                document.getElementById("main").classList.remove("main-pushed-margin");
-            } else {
-                document.getElementById("sideMenu").style.width = "min(400px, 90vw)";
-                document.getElementById("sideOpen").style.left = "min(400px, 90vw)";
-                document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
-                document.getElementById("main").classList.add("main-pushed-margin");
-            }
-            menuOpen = !menuOpen;
-        }
-        toggleMenu();
-    </script>
 </div>
 </div>
 <div id="mobile-form">
@@ -132,6 +88,52 @@
             </div>
         </form>
 </div>
+<script>
+    compareFields = document.getElementsByClassName("compare-field");
+    ethnicityFields = document.getElementsByClassName("ethnicity-field");
+    levelFields = document.getElementsByClassName("level-field");
+    defaultInputs = document.getElementsByClassName("default-value");
+
+    function changeForm() {
+        /* Each time a change is made, disable filter fields based on comparison. */
+        for (let i = 0; i < 2; i++) { // Loop to pass over both forms (desktop and mobile).
+            ethnicityFields[i].disabled = false;
+            levelFields[i].disabled = false;
+            if (compareFields[i].value == "Compare by Ethnicity") {
+                ethnicityFields[i].disabled = true;
+                ethnicityFields[i].value = "No filter";
+                defaultInputs[i].name = "ethnicity";
+            } 
+            else if (compareFields[i].value == "Compare by Level") {
+                levelFields[i].disabled = true;
+                levelFields[i].value = "No filter";
+                defaultInputs[i].name = "level";
+            } else {
+                defaultInputs[i].name = "none";
+            }
+        }
+    }
+
+    changeForm(); // Update when page is first loaded.
+
+    var menuOpen = false;
+    function toggleMenu() {
+        /* Open and close the side menu. */
+        if (menuOpen) {
+            document.getElementById("sideMenu").style.width = "0px";
+            document.getElementById("sideOpen").style.left = "0px";
+            document.getElementById("arrowImage").src = "/static/icons/right-arrow.png";
+            document.getElementById("main").classList.remove("main-pushed-margin");
+        } else {
+            document.getElementById("sideMenu").style.width = "min(400px, 90vw)";
+            document.getElementById("sideOpen").style.left = "min(400px, 90vw)";
+            document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
+            document.getElementById("main").classList.add("main-pushed-margin");
+        }
+        menuOpen = !menuOpen;
+    }
+    toggleMenu();
+</script>
 {% with messages = get_flashed_messages() %}
 {% if messages|length > 0 %}
     <dialog open class="flash-dialog">
