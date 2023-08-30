@@ -80,18 +80,16 @@ def read_data():
             flash("Incorrect Password")
             return redirect("/submit-nzqa")
         # Data is entered using 'data_uploader.py'.
-        try:
-            lines = upload.read_csv(file)
-            # Add any new categories that appear in the data.
-            upload.add_categories(lines, db, models)
-            # Add the results.
-            upload.add_results(lines, db, models)
-        except:
+        lines = upload.read_csv(file)
+        if lines is False:
             flash("Error: File is not formatted correctly.")
             return redirect("/submit-nzqa")
-        else:
-            flash("Data succesfully Uploaded!")
-            return redirect("/nzqa-data")
+        # Add any new categories that appear in the data.
+        upload.add_categories(lines, db, models)
+        # Add the results.
+        upload.add_results(lines, db, models)
+        flash("Data succesfully Uploaded!")
+        return redirect("/nzqa-data")
     else:
         flash("Error: Must be a .csv file.")
         return redirect("/submit-nzqa")

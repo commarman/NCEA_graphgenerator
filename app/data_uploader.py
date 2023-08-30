@@ -8,9 +8,13 @@ NATIONAL_NAME = "Decile 8-10"
 
 
 def read_csv(csv_file):
-    """Read the csv file."""
+    """Read the csv file and check for incorrect formatting."""
     lines = csv_file.readlines()
     lines = [line.decode("utf-8").split(",") for line in lines]
+    if len(lines) < 5:  # At least one result row must exist.
+        return False
+    if len(lines[0]) != 31:   # 31 is the number of columns.
+        return False
     return lines[4:]  # First four lines are headers.
 
 
@@ -84,6 +88,7 @@ def add_results(csv_file, db, models):
         db.session.add(bhs_result)
         db.session.add(comp_result)
     db.session.commit()
+    return True
 
 
 def clear_results(db, models):
