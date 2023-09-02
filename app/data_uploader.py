@@ -52,7 +52,8 @@ def add_results(csv_file, db, models):
 
     # Numpy used to speed up processing.
     csv_file = np.array(csv_file)
-    used_lines = csv_file[(csv_file[:, 5] != '0')]  # Get all lines with an entry from Burnside.
+    # Get all lines with an entry from Burnside.
+    used_lines = csv_file[(csv_file[:, 5] != '0')]
     for line in used_lines:
         subject, level, ethnicity, assess_type, year = line[:5]
         bhs_results = line[5:18]
@@ -80,11 +81,15 @@ def add_results(csv_file, db, models):
         comp_e = compare_results[11]
         comp_id = models.Grouping.query.filter_by(name=NATIONAL_NAME)[0].id
 
-        bhs_result = models.Result(subject_id, year_id, ethnicity_id, bhs_id,level, external, 
-                                   bhs_entries, bhs_assessed, bhs_na, bhs_a, bhs_m, bhs_e)
+        bhs_result = models.Result(subject_id, year_id, ethnicity_id,
+                                   bhs_id, level, external,
+                                   bhs_entries, bhs_assessed,
+                                   bhs_na, bhs_a, bhs_m, bhs_e)
 
-        comp_result = models.Result(subject_id, year_id, ethnicity_id, comp_id, level, external, 
-                                    comp_entries, comp_assessed, comp_na, comp_a, comp_m, comp_e)
+        comp_result = models.Result(subject_id, year_id, ethnicity_id,
+                                    comp_id, level, external,
+                                    comp_entries, comp_assessed,
+                                    comp_na, comp_a, comp_m, comp_e)
         db.session.add(bhs_result)
         db.session.add(comp_result)
     db.session.commit()

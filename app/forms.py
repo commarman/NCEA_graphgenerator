@@ -21,11 +21,19 @@ def create_filter_form(subjects, ethnicities):
 
     class FilterForm(FlaskForm):
         """Form for selecting filters to return graphs."""
-        subject = SelectField("Subject", choices=["No filter"] + subjects, validators=[DataRequired()])
-        assess_type = SelectField("Assessment Type", choices=["No filter","Internal", "External"])
-        ethnicity = SelectField("Ethnicity", choices=["No filter"] + ethnicities)
-        level = SelectField("NCEA Level", choices=["No filter", "Level 1", "Level 2", "Level 3"])
-        compare = SelectField("Comparison", choices=["No Comparison", "Compare by Decile", "Compare by Ethnicity", "Compare by Level"])
+        subject = SelectField("Subject", choices=["No filter"] + subjects,
+                              validators=[DataRequired()])
+        assess_type = SelectField("Assessment Type",
+                                  choices=["No filter","Internal", "External"])
+        ethnicity = SelectField("Ethnicity",
+                                choices=["No filter"] + ethnicities)
+        level = SelectField("NCEA Level",
+                            choices=["No filter", "Level 1", "Level 2", "Level 3"])
+        compare = SelectField("Comparison",
+                              choices=["No Comparison",
+                                       "Compare by Decile",
+                                       "Compare by Ethnicity",
+                                       "Compare by Level"])
         submit = SubmitField("Generate")
 
     return FilterForm()

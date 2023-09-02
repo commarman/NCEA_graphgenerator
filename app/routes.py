@@ -12,11 +12,14 @@ import numpy as np
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy()
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(basedir, "results.db")
+DB_URI = os.path.join(basedir, "results.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + DB_URI
 db.init_app(app)
 import app.models as models
 app.config.from_pyfile('config.py')
-HASHED_DATABASE_PASSWORD = "pbkdf2:sha256:260000$Hf0NEOHyI5TLiHdD$16df7450344156ac3744527e4fefddc5b9bc9d79610dbbfb8b1007abbe1d1f3a"
+HASHED_DATABASE_PASSWORD = """
+pbkdf2:sha256:260000$Hf0NEOHyI5TLiHdD$16df7450344156ac3744527e4fefddc5b9bc9d79610dbbfb8b1007abbe1d1f3a
+"""
 
 
 def construct_filter_form():
@@ -59,7 +62,8 @@ def nzqa_data():
         return redirect("/submit-nzqa")
 
     filter_form = construct_filter_form()
-    return render_template("compare-new.html", form=filter_form, page="graph", graph=False)
+    return render_template("compare-new.html", form=filter_form, 
+                           page="graph", graph=False)
 
 
 @app.route("/submit-nzqa", methods=["GET", "POST"])
@@ -99,7 +103,8 @@ def read_data():
 def clear_data():
     """Render the data clearing page."""
     delete_form = DeleteForm()
-    return render_template("clear-data.html", form=delete_form, page="data_clear")
+    return render_template("clear-data.html", form=delete_form, 
+                           page="data_clear")
 
 
 @app.route("/delete-data", methods=["POST"])
@@ -124,7 +129,9 @@ def render_graph(graph, additional_information):
     """Render the graph display page with a graph."""
     filter_form = construct_filter_form()
     graph_data = json.dumps(graph)
-    return render_template("compare-new.html", form=filter_form, page="graph", graph=True, info=graph_data, additional=additional_information)
+    return render_template("compare-new.html", form=filter_form, page="graph",
+                           graph=True, info=graph_data,
+                           additional=additional_information)
 
 
 @app.route("/retrieve-graph-data", methods=["POST"])
@@ -158,12 +165,14 @@ def retrieve_graph_data():
         ethnicity_id = models.Ethnicity.query.filter_by(name=ethnicity).first_or_404().id
         base_results = base_results.filter_by(ethnicity_id=ethnicity_id)
     if level != "No filter":
-        base_results = base_results.filter_by(level=int(level.split(" ")[1]))  # Level is received in format 'Level X'
+        # Level is received in format 'Level X'
+        base_results = base_results.filter_by(level=int(level.split(" ")[1]))
 
     # Once filters are applied, get all results to be processed.
     base_results = base_results.all()
     # graph is the final dictionary used to produce a graph.
-    graph = {"years": [], "title": generate_title(comparative, level, subject, assess_type, ethnicity)}
+    graph = {"years": [], "title": generate_title(comparative, level, subject,
+                                                  assess_type, ethnicity)}
     # Create a dictionary to store results for each dataset being compared.
     result_dict = {}
     for result in base_results:
@@ -179,8 +188,13 @@ def retrieve_graph_data():
         # Get the current results for the key, or create an empty dict.
         current = result_dict.get(key, {})
         # Use numpy vectorisation to quickly add arrays of grades.
-        current[year] = current.get(year, np.zeros(5)) + np.array([result.not_achieved, result.achieved, result.merit, result.excellence, result.total_entries])
-        result_dict[key] = current  # Newly created dictionaries need to be added, otherwise this line has no effect.
+        result_array = np.array([result.not_achieved,
+                                 result.achieved,
+                                 result.merit,
+                                 result.excellence,
+                                 result.total_entries])
+        current[year] = current.get(year, np.zeros(5)) + result_array
+        result_dict[key] = current  # Adds newly created dictionaries.
         if year not in graph["years"]:
             graph["years"].append(year)
 
@@ -188,7 +202,8 @@ def retrieve_graph_data():
     additional_information = {"entry_totals": [[year, 0] for year in graph["years"]]}
     graph["data_set_labels"] = list(result_dict.keys())
 
-    if len(graph["data_set_labels"]) > 6:  # Not enough colours to display over 6.
+    # Not enough colours to display over 6.
+    if len(graph["data_set_labels"]) > 6:
         flash("Error: Too many datasets.")
         return redirect("nzqa-data")
 
@@ -205,7 +220,7 @@ def retrieve_graph_data():
             year_index = graph["years"].index(year)
             for j, grade in enumerate(computed_values[:-1]):
                 graph["results"][i][j][year_index] = grade
-            # Get the total number of Burnside High School entries for each year in the data.
+            # Get the total number of Burnside High School entries each year.
             if key not in ["Decile 8-10", "National"]:
                 index = graph["years"].index(year)
                 additional_information["entry_totals"][index][1] += int(grades[4])

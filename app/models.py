@@ -58,8 +58,10 @@ class Result(db.Model):
     year = db.relationship("AcademicYear")
     group = db.relationship("Grouping")
 
-    def __init__(self, subject_id, year_id, ethnicity_id, grouping_id, level, external,
-                 total_entries, assessed, not_achieved, achieved, merit, excellence):
+    def __init__(self, subject_id, year_id, ethnicity_id,
+                 grouping_id, level, external,
+                 total_entries, assessed, not_achieved,
+                 achieved, merit, excellence):
         self.subject_id = subject_id
         self.year_id = year_id
         self.ethnicity_id = ethnicity_id
