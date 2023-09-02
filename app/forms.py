@@ -1,3 +1,5 @@
+"""WTForms objects."""
+
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed, DataRequired
 from wtforms import SubmitField, SelectField, PasswordField
@@ -12,6 +14,8 @@ class UploadForm(FlaskForm):
 
 
 class DeleteForm(FlaskForm):
+    """Form for Clearing NZQA data."""
+
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Clear Database")
 

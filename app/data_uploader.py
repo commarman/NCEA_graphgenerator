@@ -47,9 +47,10 @@ def add_categories(csv_file, db, models):
 
 def add_results(csv_file, db, models):
     """Add results from a csv file.
-       Assumes all subjects, ethnicities, and years
-       already exist in the corresponding table."""
 
+    Assumes all subjects, ethnicities, and years
+    already exist in the corresponding table.
+    """
     # Numpy used to speed up processing.
     csv_file = np.array(csv_file)
     # Get all lines with an entry from Burnside.
@@ -98,7 +99,6 @@ def add_results(csv_file, db, models):
 
 def clear_results(db, models):
     """Clear the results table."""
-
     models.Result.query.delete()
     models.Subject.query.delete()
     models.Ethnicity.query.delete()

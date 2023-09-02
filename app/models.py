@@ -1,3 +1,5 @@
+"""Models for the database."""
+
 from app.routes import db
 
 

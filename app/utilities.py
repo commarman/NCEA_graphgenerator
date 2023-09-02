@@ -1,12 +1,17 @@
 """Utility functions.
-   Created on 26/08/2023"""
+
+Created on 26/08/2023
+"""
 import re
+
 
 
 def generate_title(comparative, level, subject, assessment_type, ethnicity):
     """Generates a title based on filters and
     what kind of comparison is being made."""
 
+def generate_title(comparative, level, subject, assessment_type, ethnicity):
+    """Generate a title based on filters and what kind of comparison is being made."""
     if comparative == "Compare by Decile":
         title = f"Burnside against Decile 8-10 {level} {subject} {assessment_type} results for {ethnicity} students"
     elif comparative == "Compare by Ethnicity":
@@ -18,3 +23,4 @@ def generate_title(comparative, level, subject, assessment_type, ethnicity):
         # Use regex to remove 'No filter' appearances.
     title = re.sub("No filter ", "", title)
     return title
+
