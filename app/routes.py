@@ -210,7 +210,7 @@ def retrieve_graph_data():
     num_years = len(graph["years"])
     number_sets = len(result_dict.values())
     graph["results"] = [[[0 for _ in range(num_years)] for _ in range(4)] for _ in range(number_sets)]
-    i = 0
+    dataset_index = 0
     for key, dataset in result_dict.items():
         for year, grades in dataset.items():
             # Convert numbers to proportions.
@@ -218,13 +218,13 @@ def retrieve_graph_data():
             computed_values = np.round(proportion * 100)
             # Restructure data to be seperated by grade.
             year_index = graph["years"].index(year)
-            for j, grade in enumerate(computed_values[:-1]):
-                graph["results"][i][j][year_index] = grade
+            for grade_index, grade in enumerate(computed_values[:-1]):
+                graph["results"][dataset_index][grade_index][year_index] = grade
             # Get the total number of Burnside High School entries each year.
             if key not in ["Decile 8-10", "National"]:
                 index = graph["years"].index(year)
                 additional_information["entry_totals"][index][1] += int(grades[4])
-        i += 1
+        dataset_index += 1
     return render_graph(graph, additional_information)
 
 
