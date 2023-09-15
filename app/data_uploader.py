@@ -11,6 +11,10 @@ def read_csv(csv_file):
     """Read the csv file and check for incorrect formatting."""
     lines = csv_file.readlines()
     lines = [line.decode("utf-8").split(",") for line in lines]
+    with open("/app/static/header.txt", "r") as header:
+        header_format = header.readlines()
+        if header_format != lines[:4]:
+            return False
     if len(lines) < 5:  # At least one result row must exist.
         return False
     if len(lines[0]) != 31:   # 31 is the number of columns.

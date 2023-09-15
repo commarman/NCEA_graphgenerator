@@ -1,0 +1,4 @@
+Standard Entries and Results,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Subject,Level,Ethnicity,Assessment Type,Academic Year,Total Entries,No Result Entries,Absent Entries,Void Entries,"Assessed
+ Entries",Qty. Not Achieved,Rate Not Achieved,Qty. Achieved,Rate Achieved,Qty. Merit,Rate Merit,Qty. Excellence,Rate Excellence,Comp. Total Entries,Comp. No Result Entries,Comp. Absent Entries,Comp. Void Entries,"Comp. Assessed
+ Entries",Comp. Qty. Not Achieved,Comp. Rate Not Achieved,Comp. Qty. Achieved,Comp. Rate Achieved,Comp. Qty. Merit,Comp. Rate Merit,Comp. Qty. Excellence,Comp. Rate Excellence

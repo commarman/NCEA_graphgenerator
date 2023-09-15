@@ -17,9 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + DB_URI
 db.init_app(app)
 import app.models as models
 app.config.from_pyfile('config.py')
-HASHED_DATABASE_PASSWORD = """
-pbkdf2:sha256:260000$Hf0NEOHyI5TLiHdD$16df7450344156ac3744527e4fefddc5b9bc9d79610dbbfb8b1007abbe1d1f3a
-"""
+HASHED_DATABASE_PASSWORD = "pbkdf2:sha256:260000$FysSCFREptkS6rJb$ef21afc6d20c1dae9d39eb7586b2d105586c6a97d3fcf6cca1b799ab0926c738"
 
 
 def construct_filter_form():
