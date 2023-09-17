@@ -14,6 +14,8 @@ def read_csv(csv_file):
     with open("app/static/header.txt", "r") as header:
         header_format = header.read().splitlines()
         header_format = [line.split(",") for line in header_format]
+        print(header_format)
+        print(lines[:4])
         if header_format != lines[:4]:
             return False
     if len(lines) < 5:  # At least one result row must exist.
