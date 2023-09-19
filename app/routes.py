@@ -126,6 +126,10 @@ def delete_data():
 def render_graph(graph, additional_information):
     """Render the graph display page with a graph."""
     filter_form = construct_filter_form()
+    if len(graph["data_set_labels"]) == 0:
+        flash("No results for the chosen filters.")
+        return render_template("compare-new.html", form=filter_form,
+                               page="graph", graph=False)
     graph_data = json.dumps(graph)
     return render_template("compare-new.html", form=filter_form, page="graph",
                            graph=True, info=graph_data,
