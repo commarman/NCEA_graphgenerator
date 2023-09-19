@@ -10,7 +10,7 @@
         </ul>
         <b>Please note: Uploading data can take up to 30 seconds.</b>
     <div class="centre-form">
-        <form action="/read-data" method="post" enctype="multipart/form-data" class="centre-form" onsubmit="loadBar()">
+        <form action="/read-data" method="post" enctype="multipart/form-data" class="centre-form">
             <label for="csvfile" class="form-button">Select CSV file</label>
             {{form.nzqa(id="csvfile", class="hidden", accept=".csv", onchange="displayFilename(this)")}}
             <p id="filename-display"></p>
@@ -19,11 +19,11 @@
                 {{form.password(class="password-field")}}
             </div>
             <label for="submit-button" class="form-button" id="submit-label" style="visibility:hidden;">Upload</label>
-            {{form.submit(class="hidden", id="submit-button", onclick="loadBar()")}}
+            {{form.submit(class="hidden", id="submit-button", onclick="displayLoadingMessage()")}}
             {{form.csrf_token}}
         </form>
     </div>
-    <img id="loading-bar" src="/static/icons/LoadingBar.gif" style="visibility: hidden;">
+    <p class="fading-text" id="load-text">Please wait while data uploads...</p>
     </div>
     {% with messages = get_flashed_messages() %}
         {% if messages|length > 0 %}
@@ -47,9 +47,20 @@
             document.getElementById("submit-label").style.visibility = "visible"
         }
 
-        function loadBar() {
-            /* Display a loading bar. */
-            document.getElementById("loading-bar").style.visibility = "visible";
+        function displayLoadingMessage() {
+            /* Display a loading message. */
+            loadMsg = document.getElementById("load-text");
+            // Make the loading message visible and set its opacity to 1 to make it fade in.
+            // The loading message has a transition time of 2s.
+            loadMsg.style.visibility = "visible";
+            loadMsg.style.opacity = 1;
+            // Each call to set timeout altenates setting the opacity from 1 to 0 with increasing delays.
+            // All setTimeout calls are made in a row, but the time is increased by a constant amount.
+            // To produce an alternating effect.
+            for (let i = 0; i < 10; i++) {           
+                setTimeout(() => {loadMsg.style.opacity = 0;}, 2000 + i * 4000);
+                setTimeout(() => {loadMsg.style.opacity = 1;}, 4000 + i * 4000);
+            }
         }
 
     </script>

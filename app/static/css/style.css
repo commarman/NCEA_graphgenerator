@@ -184,6 +184,12 @@ h1, h2 {
     cursor: pointer;
 }
 
+.fading-text {
+    visibility: hidden;
+    transition: 2s;
+    opacity: 0;
+}
+
 
 /* Graph Generation Page. */
 
