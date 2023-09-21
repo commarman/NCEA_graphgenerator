@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+    <!-- Side menu section is displayed for screen sizes larger than 1300px.-->
     <div id="sideMenu" class="side-menu">
         <h1>Generate</h1>
         <form action="/retrieve-graph-data" method="post" class="filter-form">
@@ -37,6 +38,7 @@
                 <p class="info-text">No graph generated.</p>
             {% endif %}
             {% if graph %}
+            {# If a graph is generated, display additional information.  #}
                 <button onclick="showInfo()" id="show-info-button"  style="display: none;" class="form-button">Show Additional Information</button>
                 <button onclick="hideInfo()" id="hide-info-button"  class="form-button">Hide Additional Information</button>
             <div id="additional-info">
@@ -68,6 +70,7 @@
     </div>
 </div>
 </div>
+<!-- Form displayed for screen sizes less than 1300px.-->
 <div id="mobile-form">
     <h1>Generate</h1>
         <form action="/retrieve-graph-data" method="post" class="filter-form">
@@ -99,6 +102,8 @@
         for (let i = 0; i < 2; i++) { // Loop to pass over both forms (desktop and mobile).
             ethnicityFields[i].disabled = false;
             levelFields[i].disabled = false;
+            /* Default inputs makes sure all arguments of the form are passed.
+               When some fields are disabled. */
             if (compareFields[i].value == "Compare by Ethnicity") {
                 ethnicityFields[i].disabled = true;
                 ethnicityFields[i].value = "No filter";
@@ -114,7 +119,9 @@
         }
     }
 
-    changeForm(); // Update when page is first loaded.
+    // Update when page is first loaded.
+    // Makes sure fields are disabled if comparison choice is made.
+    changeForm();
 
     var menuOpen = false;
     function toggleMenu() {
@@ -135,121 +142,122 @@
     toggleMenu();
 </script>
 {% with messages = get_flashed_messages() %}
-{% if messages|length > 0 %}
-    <dialog open class="flash-dialog">
-        {% for message in messages %}
-            <p>{{message}}</p>
-        {% endfor %}
-        <button onclick="this.parentElement.close()">Close</button>
-    </dialog>
-{% endif %}
+    {# Display Error and informative messages. #}
+    {% if messages|length > 0 %}
+        <dialog open class="flash-dialog">
+            {% for message in messages %}
+                <p>{{message}}</p>
+            {% endfor %}
+            <button onclick="this.parentElement.close()">Close</button>
+        </dialog>
+    {% endif %}
 {% endwith %}
 {% if graph %}
-{% block javascript %}
-<script>
-    infoButton = document.getElementById("show-info-button");
-    hideButton = document.getElementById("hide-info-button");
-    infoList = document.getElementById("additional-info");
-    function showInfo() {
-        /* Display additional information.*/
-        infoButton.style.display = "none";
-        hideButton.style.display = "block";
-        infoList.style.height = "300px";
-    }
-    function hideInfo() {
-        /* Hide additional information.*/
-        infoButton.style.display = "block";
-        hideButton.style.display = "none";
-        infoList.style.height = "0px";
-    }
+    {% block javascript %}
+    <script>
+        infoButton = document.getElementById("show-info-button");
+        hideButton = document.getElementById("hide-info-button");
+        infoList = document.getElementById("additional-info");
+        function showInfo() {
+            /* Display additional information.*/
+            infoButton.style.display = "none";
+            hideButton.style.display = "block";
+            infoList.style.height = "300px";
+        }
+        function hideInfo() {
+            /* Hide additional information.*/
+            infoButton.style.display = "block";
+            hideButton.style.display = "none";
+            infoList.style.height = "0px";
+        }
 
-    graph = JSON.parse({{info | tojson}});
-    numDatasets = graph["results"].length;
-    // Set of colours for graphs. 
-    COLOURS = [["rgb(245,72,66)","rgb(66,123,245)","rgb(245,197,66)"], 
-               ["rgb(227, 66, 52)","rgb(147, 190, 223)","rgb(248, 228, 114)"],
-               ["rgb(247, 23, 53)","rgb(40, 50, 194)","rgb(251, 225, 6)"],
-               ["rgb(144, 13, 9)","rgb(5, 16, 148)","rgb(255, 149, 5)"],
-               ["rgb(188, 84, 75)","rgb(142, 249, 243)","rgb(238, 252, 94)"],
-               ["rgb(227, 36, 43)","rgb(56, 57, 97)","rgb(255, 182, 39)"]];
-    colours = COLOURS.slice(0,numDatasets); // Get a slice up to the number of stacks.
-    datasets = [];
+        graph = JSON.parse({{info | tojson}});
+        numDatasets = graph["results"].length;
+        // Set of colours for graphs. 
+        COLOURS = [["rgb(245,72,66)","rgb(66,123,245)","rgb(245,197,66)"], 
+                ["rgb(227, 66, 52)","rgb(147, 190, 223)","rgb(248, 228, 114)"],
+                ["rgb(247, 23, 53)","rgb(40, 50, 194)","rgb(251, 225, 6)"],
+                ["rgb(144, 13, 9)","rgb(5, 16, 148)","rgb(255, 149, 5)"],
+                ["rgb(188, 84, 75)","rgb(142, 249, 243)","rgb(238, 252, 94)"],
+                ["rgb(227, 36, 43)","rgb(56, 57, 97)","rgb(255, 182, 39)"]];
+        colours = COLOURS.slice(0,numDatasets); // Get a slice up to the number of stacks.
+        datasets = [];
 
-    for (let i = 0; i < numDatasets; i++) { // For each stack, create a dataset for each grade.
-        datasets.push({
-            label: `${graph["data_set_labels"][i]} Excellence`,
-            data: graph["results"][i][3],
-            backgroundColor: colours[i][2],
-            stack: graph["data_set_labels"][i]
-        })
-        datasets.push({
-            label: `${graph["data_set_labels"][i]} Merit`,
-            data: graph["results"][i][2],
-            backgroundColor: colours[i][1],
-            stack: graph["data_set_labels"][i]
-        })
-        datasets.push({
-            label: `${graph["data_set_labels"][i]} Achieved`,
-            data: graph["results"][i][1],
-            backgroundColor: colours[i][0],
-            stack: graph["data_set_labels"][i]
-        })
-        datasets.push({
-            label: `${graph["data_set_labels"][i]} Not Achieved`,
-            data: graph["results"][i][0],
-            backgroundColor: `rgba(110,110,110,0.5)`,
-            stack: graph["data_set_labels"][i]
-        })
-    }
-    var chartData = {
-        labels: graph["years"],
-        datasets : datasets
-    }
-    // Create the chart.
-    new Chart("NCEAgraph", {
-        type: "bar",
-        data : chartData,
-        options : {
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    min: 0,
-                    max: 100,
-                    ticks: {
-                        stepSize: 5,
-                        callback: function(value) {
-                            /* Sets y-ticks to percentages.*/
-                            return value + "%"
-                        } 
+        for (let i = 0; i < numDatasets; i++) { // For each stack, create a dataset for each grade.
+            datasets.push({
+                label: `${graph["data_set_labels"][i]} Excellence`,
+                data: graph["results"][i][3],
+                backgroundColor: colours[i][2],
+                stack: graph["data_set_labels"][i]
+            });
+            datasets.push({
+                label: `${graph["data_set_labels"][i]} Merit`,
+                data: graph["results"][i][2],
+                backgroundColor: colours[i][1],
+                stack: graph["data_set_labels"][i]
+            });
+            datasets.push({
+                label: `${graph["data_set_labels"][i]} Achieved`,
+                data: graph["results"][i][1],
+                backgroundColor: colours[i][0],
+                stack: graph["data_set_labels"][i]
+            });
+            datasets.push({
+                label: `${graph["data_set_labels"][i]} Not Achieved`,
+                data: graph["results"][i][0],
+                backgroundColor: `rgba(110,110,110,0.5)`,
+                stack: graph["data_set_labels"][i]
+            });
+        }
+        var chartData = {
+            labels: graph["years"],
+            datasets : datasets
+        }
+        // Create the chart.
+        new Chart("NCEAgraph", {
+            type: "bar",
+            data : chartData,
+            options : {
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 5,
+                            callback: function(value) {
+                                /* Sets y-ticks to percentages.*/
+                                return value + "%"
+                            } 
+                        },
+                        title : {
+                            display: true,
+                            text: "Percentage"
+                        }
                     },
-                    title : {
-                        display: true,
-                        text: "Percentage"
+                    x : {
+                        stacked: true,
+                        title : {
+                            display: true,
+                            text: "Year"
+                        }
                     }
                 },
-                x : {
-                    stacked: true,
+                plugins: {
                     title : {
                         display: true,
-                        text: "Year"
+                        text: graph["title"],
+                        font : {
+                            size: 12
+                        }
+                    },
+                    legend : {
+                        position: "bottom",
                     }
-                }
-            },
-            plugins: {
-                title : {
-                    display: true,
-                    text: graph["title"],
-                    font : {
-                        size: 12
-                    }
-                },
-                legend : {
-                    position: "bottom",
                 }
             }
-        }
-    });
-</script>
-{% endblock %}
+        });
+    </script>
+    {% endblock %}
 {% endif %}
 {% endblock %}

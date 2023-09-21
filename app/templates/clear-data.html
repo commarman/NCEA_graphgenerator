@@ -17,6 +17,7 @@
 </div>
 </div>
 {% with messages = get_flashed_messages() %}
+    {# Display Error and informative messages. #}
     {% if messages|length > 0 %}
         <dialog open class="flash-dialog">
             {% for message in messages %}

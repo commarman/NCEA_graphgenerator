@@ -49,7 +49,7 @@ def page_not_found(e):
 @app.route("/")
 def home():
     """Render the home page."""
-    return render_template("home.html", page="home")
+    return render_template("home.html")
 
 
 @app.route("/nzqa-data")
@@ -60,15 +60,14 @@ def nzqa_data():
         return redirect("/submit-nzqa")
 
     filter_form = construct_filter_form()
-    return render_template("compare-new.html", form=filter_form,
-                           page="graph", graph=False)
+    return render_template("compare-new.html", form=filter_form, graph=False)
 
 
 @app.route("/submit-nzqa", methods=["GET", "POST"])
 def submit_data():
     """Render the data submission page."""
     upload_form = UploadForm()
-    return render_template("upload.html", form=upload_form, page="upload")
+    return render_template("upload.html", form=upload_form)
 
 
 @app.route("/read-data", methods=["POST"])
@@ -83,6 +82,7 @@ def read_data():
             return redirect("/submit-nzqa")
         # Data is entered using 'data_uploader.py'.
         lines = upload.read_csv(file)
+        # read_csv returns false if formatted incorrectly.
         if lines is False:
             flash("Error: File is not formatted correctly.")
             return redirect("/submit-nzqa")
@@ -101,8 +101,7 @@ def read_data():
 def clear_data():
     """Render the data clearing page."""
     delete_form = DeleteForm()
-    return render_template("clear-data.html", form=delete_form,
-                           page="data_clear")
+    return render_template("clear-data.html", form=delete_form)
 
 
 @app.route("/delete-data", methods=["POST"])
@@ -129,9 +128,9 @@ def render_graph(graph, additional_information):
     if len(graph["data_set_labels"]) == 0:
         flash("No results for the chosen filters.")
         return render_template("compare-new.html", form=filter_form,
-                               page="graph", graph=False)
+                               graph=False)
     graph_data = json.dumps(graph)
-    return render_template("compare-new.html", form=filter_form, page="graph",
+    return render_template("compare-new.html", form=filter_form,
                            graph=True, info=graph_data,
                            additional=additional_information)
 
@@ -180,15 +179,15 @@ def retrieve_graph_data():
     for result in base_results:
         year = result.year.year
         if comparative == "Compare by Ethnicity":
-            key = result.ethnicity.name
+            dataset_key = result.ethnicity.name
         elif comparative == "Compare by Level":
-            key = f"Level {result.level}"
+            dataset_key = f"Level {result.level}"
         elif comparative == "Compare by Decile":
-            key = result.group.name
+            dataset_key = result.group.name
         else:
-            key = "Burnside"
+            dataset_key = "Burnside"
         # Get the current results for the key, or create an empty dict.
-        current = result_dict.get(key, {})
+        current = result_dict.get(dataset_key, {})
         # Use numpy vectorisation to quickly add arrays of grades.
         result_array = np.array([result.not_achieved,
                                  result.achieved,
@@ -196,11 +195,12 @@ def retrieve_graph_data():
                                  result.excellence,
                                  result.total_entries])
         current[year] = current.get(year, np.zeros(5)) + result_array
-        result_dict[key] = current  # Adds newly created dictionaries.
+        result_dict[dataset_key] = current  # Adds newly created dictionaries.
         if year not in graph["years"]:
             graph["years"].append(year)
 
     graph["years"].sort()
+    # Initialise entry totals.
     additional_information = {"entry_totals": [[year, 0] for year in graph["years"]]}
     graph["data_set_labels"] = list(result_dict.keys())
 
@@ -211,9 +211,10 @@ def retrieve_graph_data():
 
     num_years = len(graph["years"])
     number_sets = len(result_dict.values())
-    graph["results"] = [[[0 for _ in range(num_years)] for _ in range(4)] for _ in range(number_sets)]
+    graph["results"] = [[[0 for _ in range(num_years)] for _ in range(4)]
+                        for _ in range(number_sets)]
     dataset_index = 0
-    for key, dataset in result_dict.items():
+    for dataset_label, dataset in result_dict.items():
         for year, grades in dataset.items():
             # Convert numbers to proportions.
             proportion = grades / grades[4]
@@ -223,9 +224,10 @@ def retrieve_graph_data():
             for grade_index, grade in enumerate(computed_values[:-1]):
                 graph["results"][dataset_index][grade_index][year_index] = grade
             # Get the total number of Burnside High School entries each year.
-            if key not in ["Decile 8-10", "National"]:
-                index = graph["years"].index(year)
-                additional_information["entry_totals"][index][1] += int(grades[4])
+            # Exclude decile 8-10 and national results.
+            if dataset_label not in ["Decile 8-10", "National"]:
+                year_index = graph["years"].index(year)
+                additional_information["entry_totals"][year_index][1] += int(grades[4])
         dataset_index += 1
     return render_graph(graph, additional_information)
 
