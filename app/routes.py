@@ -60,7 +60,7 @@ def nzqa_data():
         return redirect("/submit-nzqa")
 
     filter_form = construct_filter_form()
-    return render_template("compare-new.html", form=filter_form, 
+    return render_template("compare-new.html", form=filter_form,
                            page="graph", graph=False)
 
 
@@ -101,7 +101,7 @@ def read_data():
 def clear_data():
     """Render the data clearing page."""
     delete_form = DeleteForm()
-    return render_template("clear-data.html", form=delete_form, 
+    return render_template("clear-data.html", form=delete_form,
                            page="data_clear")
 
 
