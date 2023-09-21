@@ -62,7 +62,6 @@ def add_results(csv_file, db, models):
     csv_file = np.array(csv_file)
     # Get all lines with an entry from Burnside.
     used_lines = csv_file[(csv_file[:, 5] != '0')]
-    print(used_lines[0])
     for line in used_lines:
         subject, level, ethnicity, assess_type, year = line[:5]
         # BHS results are columns 5 to 17.
