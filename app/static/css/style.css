@@ -190,6 +190,11 @@ h1, h2 {
     opacity: 0;
 }
 
+.long-wait-text {
+    visibility: hidden;
+    color: red;
+}
+
 
 /* Graph Generation Page. */
 

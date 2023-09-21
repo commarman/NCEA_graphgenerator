@@ -24,6 +24,7 @@
         </form>
     </div>
     <p class="fading-text" id="load-text">Please wait while data uploads...</p>
+    <p class="long-wait-text" id="wait-text">An error may have occured, waiting time is longer than expected.</p>
     </div>
     {% with messages = get_flashed_messages() %}
         {% if messages|length > 0 %}
@@ -57,10 +58,14 @@
             // Each call to set timeout altenates setting the opacity from 1 to 0 with increasing delays.
             // All setTimeout calls are made in a row, but the time is increased by a constant amount.
             // To produce an alternating effect.
-            for (let i = 0; i < 10; i++) {           
+            for (let i = 0; i < 11; i++) {           
                 setTimeout(() => {loadMsg.style.opacity = 0;}, 2000 + i * 4000);
                 setTimeout(() => {loadMsg.style.opacity = 1;}, 4000 + i * 4000);
             }
+            setTimeout(() => {
+                document.getElementById("wait-text").style.visibility = "visible";
+                loadMsg.style.visibility = "hidden";
+                             }, 46000);
         }
 
     </script>
