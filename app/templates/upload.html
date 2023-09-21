@@ -10,7 +10,7 @@
         </ul>
         <b>Please note: Uploading data can take up to 30 seconds.</b>
     <div class="centre-form">
-        <form action="/read-data" method="post" enctype="multipart/form-data" class="centre-form">
+        <form action="/read-data" method="post" enctype="multipart/form-data" class="centre-form" onsubmit="displayLoadingMessage()">
             <label for="csvfile" class="form-button">Select CSV file</label>
             {{form.nzqa(id="csvfile", class="hidden", accept=".csv", onchange="displayFilename(this)")}}
             <p id="filename-display"></p>
@@ -19,7 +19,7 @@
                 {{form.password(class="password-field")}}
             </div>
             <label for="submit-button" class="form-button" id="submit-label" style="visibility:hidden;">Upload</label>
-            {{form.submit(class="hidden", id="submit-button", onclick="displayLoadingMessage()")}}
+            {{form.submit(class="hidden", id="submit-button")}}
             {{form.csrf_token}}
         </form>
     </div>
