@@ -90,9 +90,7 @@ h1, h2 {
 
 
 .section-image {
-    width: min(300px, 80vw);
-    border-radius: 10px;
-    border: 1px solid black;
+    height: 150px;
 }
 
 
@@ -120,6 +118,7 @@ h1, h2 {
     flex-direction: column;
     width: min(400px, 90vw);
     align-self: center;
+    margin-top: 2px;
 }
 
 .small-info-box {
@@ -169,6 +168,18 @@ h1, h2 {
     padding: 5px 10px;
     text-decoration: none;
     background-color: var(--grey-white);
+    border: none;
+    color: black;
+    width: fit-content;
+    font-family: 'Nunito Sans', sans-serif;
+    align-self: center;
+}
+
+.download-button {
+    font-size: 1rem;
+    padding: 5px 10px;
+    text-decoration: none;
+    background-color: var(--dark-grey-white);
     border: none;
     color: black;
     width: fit-content;
