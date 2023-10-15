@@ -23,7 +23,7 @@
     <div id="sideOpen" class="side-bar">
         <a>
             <a id="menuArrow" class="open-button" onclick="toggleMenu()">
-                <img id="arrowImage" width="50px" src="/static/icons/right-arrow.png">
+                <img id="arrowImage" width="50px" src="/static/icons/right-arrow.svg">
             </a>
         </a>
     </div>
@@ -122,12 +122,12 @@
         if (menuOpen) {
             document.getElementById("sideMenu").style.width = "0px";
             document.getElementById("sideOpen").style.left = "0px";
-            document.getElementById("arrowImage").src = "/static/icons/right-arrow.png";
+            document.getElementById("arrowImage").src = "/static/icons/right-arrow.svg";
             document.getElementById("main").classList.remove("main-pushed-margin");
         } else {
             document.getElementById("sideMenu").style.width = "min(400px, 90vw)";
             document.getElementById("sideOpen").style.left = "min(400px, 90vw)";
-            document.getElementById("arrowImage").src = "/static/icons/left-arrow.png";
+            document.getElementById("arrowImage").src = "/static/icons/left-arrow.svg";
             document.getElementById("main").classList.add("main-pushed-margin");
         }
         menuOpen = !menuOpen;

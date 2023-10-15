@@ -90,7 +90,8 @@ h1, h2 {
 
 
 .section-image {
-    height: 150px;
+    height: 160px;
+    /* width: min(300px, 80vw); */
 }
 
 
@@ -179,13 +180,16 @@ h1, h2 {
     font-size: 1rem;
     padding: 5px 10px;
     text-decoration: none;
-    background-color: var(--dark-grey-white);
+    background-color: var(--grey-white);
     border: none;
     color: black;
     width: fit-content;
     font-family: 'Nunito Sans', sans-serif;
     align-self: center;
+    display: flex;
+    align-items: center;
 }
+
 
 .password-field {
     margin-bottom: 1em;
@@ -206,6 +210,13 @@ h1, h2 {
     color: red;
 }
 
+.information-dialog {
+    width: 400px;
+}
+
+.small-text {
+    font-size: 0.9rem;
+}
 
 /* Graph Generation Page. */
 
