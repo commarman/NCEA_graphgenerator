@@ -209,6 +209,13 @@ h1, h2 {
     color: red;
 }
 
+.information-dialog {
+    width: 400px;
+}
+
+.small-text {
+    font-size: 0.9rem;
+}
 
 /* Graph Generation Page. */
 

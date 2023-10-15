@@ -2,7 +2,7 @@
 {% block content %}
     <div class="info-box">
         <h1>Import Data</h1>
-        <p class="info-text">Before generating graphs, you need to import NZQA data.</p>
+        <p class="info-text">Before generating graphs, you need to import NZQA data. This is done by the <b>Head of Technology.</b></p>
         <p class="info-text list-header">Data must be:</p>
         <ul class="info-list">
             <li>A csv file (comma seperated values)</li>
@@ -24,11 +24,34 @@
             </form>
         </div>
         <div class="info-box">
+            <p class="info-text">An explanation of uploading data is found below.</p>
+            <button class="form-button" onclick="openInformation()">Guide to Uploading Data</button>
+            <p class="info-text">The file must also have the correct headers to match this example dataset.</p>
             <a class="download-button" href="/static/datasets/ExampleDataset.csv"><img src="/static/icons/download-icon.svg" height="20px">Download Example Dataset</a>
         <p class="fading-text" id="load-text">Please wait while data uploads...</p>
         <p class="long-wait-text" id="wait-text">An error may have occured, waiting time is longer than expected.</p>
         </div>
     </div>
+    <dialog class="information-dialog" id="information-box">
+        <p class="info-text">NZQA releases the past 5 years of data each year. When the dataset for a new year releases, 
+            the Head of Technology can upload it by following these steps.</p>
+        <p><b>Step 1:</b> Clear Previous Data.</p>
+        <p class="small-text">
+            By navigating to the Clear Data page, enter the password and press 'Clear Data'. 
+            This will remove all data currently in the database so that new data can be added without overlap.</p>
+        <p><b>Step 2:</b> Download NZQA Data and Check Headers.</p>
+            <p class="small-text">
+                After logging into NZQA, download the dataset for Burnside against Decile 8-10 schools.
+                To check that the right dataset has been downloaded, match the headers against the example csv file provided below.
+                There should be two rows of headers, the first with 'Standard Entries and Results' in column one, and the second with all 31 columns labelled.</p>
+        <p><b>Step 3:</b> Upload Data</p>
+            <p class="small-text">
+                With the downloaded dataset, press Select CSV file and choose the new data. Enter the password and then press upload.
+                The system should take around 30 seconds to process the data, but if the dataset is significantly larger than 10,000 rows it could take longer. 
+            </p>
+        <p class="info-text"></p>
+        <button onclick="this.parentElement.close()">Close</button>
+    </dialog>
     {% with messages = get_flashed_messages() %}
         {# Display Error and informative messages. #}
         {% if messages|length > 0 %}
@@ -71,6 +94,11 @@
                 document.getElementById("wait-text").style.visibility = "visible";
                 loadMsg.style.visibility = "hidden";
                              }, 46000);
+        }
+
+        function openInformation() {
+            informationBox = document.getElementById("information-box");
+            informationBox.showModal();
         }
 
     </script>
