@@ -249,7 +249,7 @@ h1, h2 {
     color: black;
     border-radius: 2px;
 }
-
+/* Set background colour of filter options. */
 .filter-field > option {
     font-size: min(3vw, 0.9rem);
     background-color: white;
@@ -260,6 +260,7 @@ h1, h2 {
     margin-inline: 5px;
 }
 
+/* Area graph takes up.*/
 .chart-container {
     width: max(400px, 38vw);
     height: max(400px, 30vw);
@@ -283,7 +284,7 @@ h1, h2 {
     animation-duration: 0.5s;
 }
 
-/* Animations */ 
+/* Animation for dialog box from top. */ 
 @keyframes from-top {
     from {top:-300px; opacity:0}
     to {top:0; opacity:1}
@@ -322,6 +323,7 @@ h1, h2 {
     transition: 0.25s;
 }
 
+/* Classes for main content, to account for side menu.*/
 .main-default {
     margin-left: 50px;
 }
@@ -337,6 +339,7 @@ h1, h2 {
     flex-wrap: wrap;
 }
 
+/* Transition time for sliding of main content.*/
 #main {
     transition: 0.3s;
 }
@@ -378,6 +381,10 @@ footer {
 }
 
 @media screen and (max-width: 1300px) {
+    /* Display for graph generation page for small screens
+       Hides the side menu and replaces it with a mobile form.
+       And fixes the main content to accommodate the change.
+    */
     .side-menu {
         display:none;
     }

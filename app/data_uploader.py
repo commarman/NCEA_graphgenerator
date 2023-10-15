@@ -10,18 +10,18 @@ NATIONAL_NAME = "Decile 8-10"
 def read_csv(csv_file):
     """Read the csv file and check for incorrect formatting."""
     raw_lines = csv_file.read().splitlines()
+    # Decode lines and split them by commas.
     lines = [line.decode("utf-8").split(",") for line in raw_lines]
+    if len(lines) < 5:  # At least one result row must exist.
+        return False
+    if len(lines[0]) != 31:  # 31 is the number of columns.
+        return False
     with open("app/static/header.txt", "r") as header:
         header_format = header.read().splitlines()
         header_format = [line.split(",") for line in header_format]
-        print(header_format)
-        print(lines[:4])
+        # Check that header matches.
         if header_format != lines[:4]:
             return False
-    if len(lines) < 5:  # At least one result row must exist.
-        return False
-    if len(lines[0]) != 31:   # 31 is the number of columns.
-        return False
     return lines[4:]  # First four lines are headers.
 
 
@@ -64,7 +64,9 @@ def add_results(csv_file, db, models):
     used_lines = csv_file[(csv_file[:, 5] != '0')]
     for line in used_lines:
         subject, level, ethnicity, assess_type, year = line[:5]
+        # BHS results are columns 5 to 17.
         bhs_results = line[5:18]
+        # Decile 8-10 results are 18-30.
         compare_results = line[18:]
 
         # Get values.
@@ -72,6 +74,7 @@ def add_results(csv_file, db, models):
         ethnicity_id = models.Ethnicity.query.filter_by(name=ethnicity)[0].id
         year_id = models.AcademicYear.query.filter_by(year=year)[0].id
         level = int(level.split(" ")[1])
+        # Boolean value for whether it is an external.
         external = (assess_type == EXT_ASSESS)
         bhs_entries = bhs_results[0]
         bhs_assessed = bhs_results[4]

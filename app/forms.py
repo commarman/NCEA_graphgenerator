@@ -28,7 +28,7 @@ def create_filter_form(subjects, ethnicities):
         subject = SelectField("Subject", choices=["No filter"] + subjects,
                               validators=[DataRequired()])
         assess_type = SelectField("Assessment Type",
-                                  choices=["No filter","Internal", "External"])
+                                  choices=["No filter", "Internal", "External"])
         ethnicity = SelectField("Ethnicity",
                                 choices=["No filter"] + ethnicities)
         level = SelectField("NCEA Level",
