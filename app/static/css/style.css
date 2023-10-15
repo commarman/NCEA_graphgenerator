@@ -90,9 +90,8 @@ h1, h2 {
 
 
 .section-image {
-    width: min(300px, 80vw);
-    border-radius: 10px;
-    border: 1px solid black;
+    height: 160px;
+    /* width: min(300px, 80vw); */
 }
 
 
@@ -175,6 +174,21 @@ h1, h2 {
     font-family: 'Nunito Sans', sans-serif;
     align-self: center;
 }
+
+.download-button {
+    font-size: 1rem;
+    padding: 5px 10px;
+    text-decoration: none;
+    background-color: var(--grey-white);
+    border: none;
+    color: black;
+    width: fit-content;
+    font-family: 'Nunito Sans', sans-serif;
+    align-self: center;
+    display: flex;
+    align-items: center;
+}
+
 
 .password-field {
     margin-bottom: 1em;

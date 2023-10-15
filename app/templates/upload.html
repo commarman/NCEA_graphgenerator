@@ -23,8 +23,11 @@
                 {{form.csrf_token}}
             </form>
         </div>
+        <div class="info-box">
+            <a class="download-button" href="/static/datasets/ExampleDataset.csv"><img src="/static/icons/download-icon.svg" height="20px">Download Example Dataset</a>
         <p class="fading-text" id="load-text">Please wait while data uploads...</p>
         <p class="long-wait-text" id="wait-text">An error may have occured, waiting time is longer than expected.</p>
+        </div>
     </div>
     {% with messages = get_flashed_messages() %}
         {# Display Error and informative messages. #}
