@@ -7,6 +7,14 @@ BHS_NAME = "Burnside High School"
 NATIONAL_NAME = "Decile 8-10"
 
 
+def cap_subject(subject_name):
+    """Capitalise the name of a subject."""
+    name = ""
+    for word in subject_name.split(" "):
+        name += word.capitalize() + " "
+    return name.strip()
+
+
 def read_csv(csv_file):
     """Read the csv file and check for incorrect formatting."""
     raw_lines = csv_file.read().splitlines()
@@ -33,7 +41,7 @@ def add_categories(csv_file, db, models):
     years = set()
     for line in csv_file:
         if line[5] != '0':  # Column 5 is the number of BHS entries.
-            subjects.add(line[0].capitalize())
+            subjects.add(cap_subject(line[0]))
             ethnicities.add(line[2])
             years.add(line[4])
 
@@ -70,7 +78,7 @@ def add_results(csv_file, db, models):
         compare_results = line[18:]
 
         # Get values.
-        subject_id = models.Subject.query.filter_by(name=subject.capitalize())[0].id
+        subject_id = models.Subject.query.filter_by(name=cap_subject(subject))[0].id
         ethnicity_id = models.Ethnicity.query.filter_by(name=ethnicity)[0].id
         year_id = models.AcademicYear.query.filter_by(year=year)[0].id
         level = int(level.split(" ")[1])
