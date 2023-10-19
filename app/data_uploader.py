@@ -11,7 +11,10 @@ def cap_subject(subject_name):
     """Capitalise the name of a subject."""
     name = ""
     for word in subject_name.split(" "):
-        name += word.capitalize() + " "
+        if word in ["AND","FOR"]:
+            name += word.lower() + " "
+        else:
+            name += word.capitalize() + " "
     return name.strip()
 
 
