@@ -17,5 +17,5 @@ def generate_title(comparative, level, subject, assessment_type, ethnicity):
     else:
         title = f"Burnside {level} {subject} {assessment_type} results for {ethnicity} students"
         # Use regex to remove 'No filter' appearances.
-    title = re.sub("No filter ", "", title)
+    title = re.sub("No Filter ", "", title)
     return title

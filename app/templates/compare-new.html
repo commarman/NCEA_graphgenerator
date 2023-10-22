@@ -14,7 +14,9 @@
                 {{form.ethnicity(class="filter-field ethnicity-field")}}
                 <label for="Comparison" class="filter-label">Comparison Type</label>
                 {{form.compare(class="filter-field compare-field", onchange="changeForm()")}}
-                <input type="hidden" name="none" value="No filter" class="default-value">
+                <label for="Year" class="filter-label">Years</label>
+                {{form.years(class="filter-field")}}
+                <input type="hidden" name="none" value="No Filter" class="default-value">
                 {{form.submit(class="form-button")}}
                 {{form.csrf_token}}
             </div>
@@ -82,7 +84,9 @@
                 {{form.ethnicity(class="filter-field ethnicity-field")}}
                 <label for="Comparison" class="filter-label">Comparison Type</label>
                 {{form.compare(class="filter-field compare-field", onchange="changeForm()")}}
-                <input type="hidden" name="none" value="No filter" class="default-value">
+                <label for="Year" class="filter-label">Years</label>
+                {{form.years(class="filter-field")}}
+                <input type="hidden" name="none" value="No Filter" class="default-value">
                 {{form.submit(class="form-button")}}
                 {{form.csrf_token}}
             </div>
@@ -101,12 +105,10 @@
             levelFields[i].disabled = false;
             if (compareFields[i].value == "Compare by Ethnicity") {
                 ethnicityFields[i].disabled = true;
-                ethnicityFields[i].value = "No filter";
                 defaultInputs[i].name = "ethnicity";
             } 
             else if (compareFields[i].value == "Compare by Level") {
                 levelFields[i].disabled = true;
-                levelFields[i].value = "No filter";
                 defaultInputs[i].name = "level";
             } else {
                 defaultInputs[i].name = "none";

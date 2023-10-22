@@ -20,24 +20,25 @@ class DeleteForm(FlaskForm):
     submit = SubmitField("Clear Database")
 
 
-def create_filter_form(subjects, ethnicities):
+def create_filter_form(subjects, ethnicities, year_list):
     """Create a FilterForm class based on provided subjects and ethnicites."""
 
     class FilterForm(FlaskForm):
         """Form for selecting filters to return graphs."""
-        subject = SelectField("Subject", choices=["No filter"] + subjects,
+        subject = SelectField("Subject", choices=["No Filter"] + subjects,
                               validators=[DataRequired()])
         assess_type = SelectField("Assessment Type",
-                                  choices=["No filter", "Internal", "External"])
+                                  choices=["No Filter", "Internal", "External"])
         ethnicity = SelectField("Ethnicity",
-                                choices=["No filter"] + ethnicities)
+                                choices=["No Filter"] + ethnicities)
         level = SelectField("NCEA Level",
-                            choices=["No filter", "Level 1", "Level 2", "Level 3"])
+                            choices=["No Filter", "Level 1", "Level 2", "Level 3"])
         compare = SelectField("Comparison",
                               choices=["No Comparison",
                                        "Compare by Decile",
                                        "Compare by Ethnicity",
                                        "Compare by Level"])
+        years = SelectField("Year", choices=["No Filter"] + year_list)
         submit = SubmitField("Generate")
 
     return FilterForm()

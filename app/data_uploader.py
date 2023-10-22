@@ -5,13 +5,17 @@ import numpy as np
 EXT_ASSESS = "Externally Assessed"
 BHS_NAME = "Burnside High School"
 NATIONAL_NAME = "Decile 8-10"
+SUBJECT_LABELS = {"TECHNOLOGY - DIGITAL TECHNOLOGIES AND HANGARAU MATIHIKO": "Digital Technologies"}
 
 
 def cap_subject(subject_name):
-    """Capitalise the name of a subject."""
+    """Capitalise the name of a subject.
+    If it is in the label dictionary, return the result."""
     name = ""
+    if subject_name in SUBJECT_LABELS:
+        return SUBJECT_LABELS[subject_name]
     for word in subject_name.split(" "):
-        if word in ["AND","FOR"]:
+        if word in ["AND", "FOR"]:
             name += word.lower() + " "
         else:
             name += word.capitalize() + " "

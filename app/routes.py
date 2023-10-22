@@ -30,7 +30,11 @@ def construct_filter_form():
     ethnicities = models.Ethnicity.query.all()
     ethnicity_list = [ethnicity.name for ethnicity in ethnicities]
     ethnicity_list.sort()
-    return create_filter_form(subject_names, ethnicity_list)
+    # Years
+    years = models.AcademicYear.query.all()
+    year_list = [year.year for year in years]
+    year_list.sort()
+    return create_filter_form(subject_names, ethnicity_list, year_list)
 
 
 # Routes.
@@ -148,6 +152,7 @@ def retrieve_graph_data():
     level = form.level.data
     ethnicity = form.ethnicity.data
     comparative = form.compare.data
+    year = form.years.data
 
     # Get a set of results to apply filters to.
     if comparative == "Compare by Decile":
@@ -156,18 +161,21 @@ def retrieve_graph_data():
         base_results = models.Result.query.filter_by(grouping_id=1)
 
     # Apply each filter.
-    if subject != "No filter":
+    if subject != "No Filter":
         subject_id = models.Subject.query.filter_by(name=subject).first_or_404().id
         base_results = base_results.filter_by(subject_id=subject_id)
-    if assess_type != "No filter":
+    if assess_type != "No Filter":
         assess_code = 1 if assess_type == "External" else 0
         base_results = base_results.filter_by(external=assess_code)
-    if ethnicity != "No filter":
+    if ethnicity != "No Filter":
         ethnicity_id = models.Ethnicity.query.filter_by(name=ethnicity).first_or_404().id
         base_results = base_results.filter_by(ethnicity_id=ethnicity_id)
-    if level != "No filter":
+    if level != "No Filter":
         # Level is received in format 'Level X'
         base_results = base_results.filter_by(level=int(level.split(" ")[1]))
+    if year != "No Filter":
+        year_id = models.AcademicYear.query.filter_by(year=year).first_or_404().id
+        base_results = base_results.filter_by(year_id=year_id)
 
     # Once filters are applied, get all results to be processed.
     base_results = base_results.all()
