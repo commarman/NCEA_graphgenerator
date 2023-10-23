@@ -33,32 +33,37 @@
         </div>
     </div>
     <dialog class="information-dialog" id="information-box">
-        <p class="info-text">NZQA releases the past 5 years of data each year. When the dataset for a new year releases, 
-            the Head of Technology can upload it by following these steps.</p>
-        <p><b>Step 1:</b> Clear Previous Data.</p>
-        <p class="small-text">
-            By navigating to the Clear Data page, enter the password and press 'Clear Data'. 
-            This will remove all data currently in the database so that new data can be added without overlap.</p>
-        <p><b>Step 2:</b> Download NZQA Data and Check Headers.</p>
+        <div class="flex-contents">
+            <h2>How to Upload Data</h2>
+            <p class="info-text">NZQA releases the past 5 years of data each year. When the dataset for a new year releases, 
+                the Head of Technology can upload it by following these steps.</p>
+            <p class="info-header"><b>Step 1:</b> Clear Previous Data.</p>
             <p class="small-text">
-                After logging into NZQA, download the dataset for Burnside against Decile 8-10 schools.
-                To check that the right dataset has been downloaded, match the headers against the example csv file provided below.
-                There should be two rows of headers, the first with 'Standard Entries and Results' in column one, and the second with all 31 columns labelled.</p>
-        <p><b>Step 3:</b> Upload Data</p>
-            <p class="small-text">
-                With the downloaded dataset, press Select CSV file and choose the new data. Enter the password and then press upload.
-                The system should take around 30 seconds to process the data, but if the dataset is significantly larger than 10,000 rows it could take longer. 
-            </p>
-        <p class="info-text"></p>
-        <button onclick="this.parentElement.close()">Close</button>
+                By navigating to the Clear Data page, enter the password and press 'Clear Data'. 
+                This will remove all data currently in the database so that new data can be added without overlap.</p>
+            <p class="info-header"><b>Step 2:</b> Download NZQA Data and Check Headers.</p>
+                <p class="small-text">
+                    After logging into NZQA, download the dataset for Burnside against Decile 8-10 schools.
+                    To check that the right dataset has been downloaded, match the headers against the example csv file provided below.
+                    There should be two rows of headers, the first with 'Standard Entries and Results' in column one, and the second with all 31 columns labelled.</p>
+            <p class="info-header"><b>Step 3:</b> Upload Data</p>
+                <p class="small-text">
+                    With the downloaded dataset, press Select CSV file and choose the new data. Enter the password and then press upload.
+                    The system should take around 30 seconds to process the data, but if the dataset is significantly larger than 10,000 rows it could take longer. 
+                </p>
+            <p class="info-text"></p>
+            <button onclick="this.parentElement.parentElement.close()" class="close-button">Close</button>
+        </div>
     </dialog>
     {% with messages = get_flashed_messages() %}
         {% if messages|length > 0 %}
             <dialog open class="flash-dialog">
-                {% for message in messages %}
+                <div class="flex-contents">
+                    {% for message in messages %}
                     <p>{{message}}</p>
-                {% endfor %}
-                <button onclick="this.parentElement.close()">Close</button>
+                    {% endfor %}
+                    <button onclick="this.parentElement.parentElement.close()"  class="close-button">Close</button>
+                </div>
             </dialog>
         {% endif %}
     {% endwith %}

@@ -5,7 +5,8 @@ import numpy as np
 EXT_ASSESS = "Externally Assessed"
 BHS_NAME = "Burnside High School"
 NATIONAL_NAME = "Decile 8-10"
-SUBJECT_LABELS = {"TECHNOLOGY - DIGITAL TECHNOLOGIES AND HANGARAU MATIHIKO": "Digital Technologies"}
+SUBJECT_LABELS = {"TECHNOLOGY - DIGITAL TECHNOLOGIES AND HANGARAU MATIHIKO": "Digital Technologies",
+                  "MATHEMATICS - STATISTICS": "Mathematics and Statistics"}
 
 
 def cap_subject(subject_name):

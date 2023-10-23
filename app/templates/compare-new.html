@@ -139,10 +139,12 @@
 {% with messages = get_flashed_messages() %}
 {% if messages|length > 0 %}
     <dialog open class="flash-dialog">
-        {% for message in messages %}
+        <div class="flex-contents">
+            {% for message in messages %}
             <p>{{message}}</p>
-        {% endfor %}
-        <button onclick="this.parentElement.close()">Close</button>
+            {% endfor %}
+            <button onclick="this.parentElement.parentElement.close()"  class="close-button">Close</button>
+        </div>
     </dialog>
 {% endif %}
 {% endwith %}

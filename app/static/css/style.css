@@ -12,6 +12,8 @@
     --light-blue: rgb(34, 75, 109);
     --grey-white: rgb(218, 221, 216);
     --dark-grey: rgb(54, 65, 62);
+    --exit-red: rgb(171, 34, 34);
+    --exit-red-hover: rgb(255, 71, 26);
 }
 
 /* Body styling */
@@ -214,8 +216,35 @@ h1, h2 {
     width: 400px;
 }
 
+.flex-contents {
+    display: flex;
+    flex-direction: column;
+}
+
 .small-text {
     font-size: 0.9rem;
+    margin-block: 0.5em;
+}
+
+.info-header {
+    margin-block: 0.5em;
+}
+
+.close-button {
+    font-size: 1rem;
+    padding: 5px 10px;
+    text-decoration: none;
+    background-color: var(--exit-red);
+    border: none;
+    color: white;
+    width: fit-content;
+    font-family: 'Nunito Sans', sans-serif;
+    align-self: center;
+}
+
+.close-button:hover {
+    cursor: pointer;
+    background-color: var(--exit-red-hover);
 }
 
 /* Graph Generation Page. */
